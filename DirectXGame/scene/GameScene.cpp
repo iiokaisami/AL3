@@ -62,6 +62,7 @@ void GameScene::Update() {
 		audio_->StopWave(voiceHandle_);
 	}
 
+	#ifdef DEBUG
 	//デバックテキストの表示
 	ImGui::Begin("Debug1");
 	ImGui::Text("Iioka Isami %d.%d.%d", 2050, 12, 31);
@@ -72,6 +73,8 @@ void GameScene::Update() {
 	ImGui::End();
 
 	ImGui::ShowDemoWindow();
+#endif // DEBUG
+
 	
 	//デバックカメラの更新
 	debugCamera_->Update();

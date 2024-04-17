@@ -7,6 +7,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Player.h"
 
 /// <summary>
 /// ゲームシーン
@@ -47,4 +48,9 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+
+	uint32_t texture_;
+	Model* model_ = nullptr;
+	Player* player_ = nullptr;
+	ViewProjection viewProjection_;
 };

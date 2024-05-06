@@ -13,8 +13,6 @@ void Player::Initialize(Model* model, uint32_t font){
     model_ = model;
 	font_ = font;
 
-	worldTransform_.Initialize();
-
 	worldTransformBlock.Initialize();
 
 	//シングルトンインスタンスを取得する
@@ -23,23 +21,25 @@ void Player::Initialize(Model* model, uint32_t font){
 	calculationMath_ = new CalculationMath;
 };
 
-void Player::Updade() { 
-	worldTransformBlock.matWorld_ = 
-		calculationMath_->MakeAffineMatrix(
-			worldTransformBlock.scale_,
-			worldTransformBlock.rotation_, 
-			worldTransformBlock.translation_);
+void Player::Update() { 
 
-	// 定数バッファに転送する
-	worldTransformBlock.TransferMatrix();
-
-	worldTransform_.TransferMatrix();
+	worldTransformBlock.UpdateMatrix();
 
 	//キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
 
 	//キャラクターの移動速さ
 	const float kCharacterSpeed = 0.2f;
+
+	//回転速さ[ラジアン/frame]
+	const float kRotSpeed = 0.02f;
+
+	//押した方向で移動ベクトルを変更
+	if (input_->PushKey(DIK_A)) {
+		worldTransformBlock.rotation_.y += kRotSpeed;
+	} else if (input_->PushKey(DIK_D)) {
+		worldTransformBlock.rotation_.y -= kRotSpeed;
+	}
 
 	//押した方向で移動ベクトルを変更（左右）
 	if (input_->PushKey(DIK_LEFT)) {
@@ -68,25 +68,31 @@ void Player::Updade() {
 	//座標移動（ベクトルの加算）
 	worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
 
+	//キャラクターの攻撃
+	Attack();
 
-	#ifdef DEBUG
+	//弾更新
+	if (bullet_){
+		bullet_->Update();
+	}
+};
 
-	//キャラクターの座標を画面表示する処理
-	ImGui::Begin(" ");
-	//ImGui::SliderFloat3("Player", worldTransformBlock.translation_, 0.0f, 1.0f);
-	ImGui::Text("Player %.3f.%.3f.%.3f",
-		worldTransformBlock.translation_.x,
-		worldTransformBlock.translation_.y, 
-		worldTransformBlock.translation_.z);
-	ImGui::End();
+void Player::Attack() { 
+	if (input_->TriggerKey(DIK_SPACE)) {
+		//弾を生成し、初期化
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialize(model_, worldTransformBlock.translation_);
 
-	#endif // DEBUG
-
-	//スケーリング行列の生成
-	//worldTransform_.scale_=calculationMath_
+		//弾を登録する
+		bullet_ = newBullet;
+	}	
 };
 
 void Player::Draw(ViewProjection& viewProjection_) { 
 	model_->Draw(worldTransformBlock, viewProjection_, font_);
 
+	// 弾描画
+	if (bullet_) {
+		bullet_->Draw(viewProjection_);
+	}
 };

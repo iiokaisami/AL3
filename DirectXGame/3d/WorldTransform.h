@@ -5,6 +5,8 @@
 #include <d3d12.h>
 #include <type_traits>
 #include <wrl.h>
+#include "CalculationMath.h"
+
 
 // 定数バッファ用データ構造体
 struct ConstBufferDataWorldTransform {
@@ -29,6 +31,8 @@ public:
 
 	WorldTransform() = default;
 	~WorldTransform() = default;
+
+	void UpdateMatrix();
 
 	/// <summary>
 	/// 初期化
@@ -60,6 +64,8 @@ private:
 	// コピー禁止
 	WorldTransform(const WorldTransform&) = delete;
 	WorldTransform& operator=(const WorldTransform&) = delete;
+
+	CalculationMath* calculationMath_ = nullptr;
 };
 
 static_assert(!std::is_copy_assignable_v<WorldTransform>);

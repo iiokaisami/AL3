@@ -5,18 +5,16 @@
 class PlayerBullet {
 public:
 
-	~PlayerBullet();
-
 	void Initialize(Model* model, const Vector3& position);
 
 	void Update();
 
 	void Draw(const ViewProjection& viewProjection);
 
-	private:
+private:
 
 	//ワールド変換データ
-	WorldTransform* worldTransform_ = nullptr;
+	WorldTransform worldTransform_;
 
 	// モデル
 	Model* model_ = nullptr;

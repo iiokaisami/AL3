@@ -2,22 +2,29 @@
 #include "cassert"
 #include "TextureManager.h"
 
-void PlayerBullet::Initialize(Model* bulletModel, const Vector3& position) {
-	// NULLポインタチェック
-	assert(bulletModel);
+PlayerBullet::~PlayerBullet() { 
+	delete worldTransform_;
+}
 
-	bulletModel_ = bulletModel;
+void PlayerBullet::Initialize(Model* model, const Vector3& position) {
+	// NULLポインタチェック
+	assert(model);
+
+	model_ = model;
+
 	//テクスチャ読み込み
-	sample_ = TextureManager::Load("debugfont.png");
+	sample_ = TextureManager::Load("sample.png");
+
+	worldTransform_->Initialize();
 
 	//引数で受け取った初期座標をリセット
-	worldTransform_.translation_ = position;
+	worldTransform_->translation_ = position;
 }
 
 void PlayerBullet::Update() {
-	worldTransform_.UpdateMatrix();
+	worldTransform_->UpdateMatrix();
 }
 
-void PlayerBullet::Draw(const ViewProjection& viewProjection) {
-	bulletModel_->Draw(worldTransform_, viewProjection, sample_);
+void PlayerBullet::Draw(const ViewProjection& viewProjection) { 
+	model_->Draw(worldTransform_, viewProjection, sample_);
 }

@@ -8,6 +8,8 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Player.h"
+#include "Enemy.h"
+
 
 /// <summary>
 /// ゲームシーン
@@ -53,4 +55,5 @@ private: // メンバ変数
 	Model* model_ = nullptr;
 	Player* player_ = nullptr;
 	ViewProjection viewProjection_;
+	Enemy* enemy_ = nullptr;
 };

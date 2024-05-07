@@ -13,6 +13,12 @@ public:
 
 	void Update();
 
+	// 接近フェーズ更新関数
+	void ApproachUpdate();
+
+	// 離脱フェーズ更新関数
+	void LeaveUpdate();
+
 	void Draw(ViewProjection& viewProjection_);
 
 private:
@@ -29,6 +35,19 @@ private:
 	
 	CalculationMath* calculationMath_ = nullptr;
 
-	Vector3 velocity_;
+	//接近フェーズ速度
+	Vector3 approachSpeed_;
+
+	//離脱フェーズ速度
+	Vector3 leaveSpeed_;
+
+	//行動フェーズ
+	enum class Phase {
+		Approach, // 接近する
+		Leave,    // 離脱する
+	};
+
+	//フェーズ
+	Phase phase_ = Enemy::Phase::Approach;
 
 };

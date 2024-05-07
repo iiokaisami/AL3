@@ -296,3 +296,14 @@ Vector3 CalculationMath::Transform(const Vector3& vector, const Matrix4x4& matri
 	result.z /= w;
 	return result;
 }
+
+//ベクトル変換
+Vector3 CalculationMath::TransformNormal(const Vector3& vel, const Matrix4x4& matrix) {
+
+	Vector3 result{
+	    vel.x * matrix.m[0][0] + vel.y * matrix.m[1][0] + vel.z * matrix.m[2][0], 
+		vel.x * matrix.m[0][1] + vel.y * matrix.m[1][1] + vel.z * matrix.m[2][1],
+	    vel.x * matrix.m[0][2] + vel.y * matrix.m[1][2] + vel.z * matrix.m[2][2]};
+
+	return result;
+}

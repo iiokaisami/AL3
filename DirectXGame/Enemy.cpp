@@ -100,7 +100,7 @@ void Enemy::LeaveUpdate() {
 
 void Enemy::Fire() {
 		// 弾の速度
-		const float kBulletSpeed = -1.0f;
+		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
 
 		//自キャラのワールド座標を取得する
@@ -112,11 +112,11 @@ void Enemy::Fire() {
 		//ベクトルの正規化
 	    Vector3 normalVec = calculationMath_->Normalize(differenceVector);
 		//ベクトルの長さを、速さに合わせる
-	    Vector3 speed = calculationMath_->Add(velocity, normalVec);
+	    velocity = calculationMath_->Multiply(kBulletSpeed, normalVec);
 
 		// 弾を生成し、初期化
 		EnemyBullet* newBullet = new EnemyBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, speed);
+		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 
 		// 弾を登録する
 		enemyBullets_.push_back(newBullet);	

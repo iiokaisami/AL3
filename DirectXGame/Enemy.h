@@ -3,6 +3,8 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "CalculationMath.h"
+#include "EnemyBullet.h"
+#include <list>
 
 class Enemy {
 public:
@@ -13,13 +15,22 @@ public:
 
 	void Update();
 
+	//接近フェーズ初期化
+	void ApproachInitialize();
+
 	// 接近フェーズ更新関数
 	void ApproachUpdate();
 
 	// 離脱フェーズ更新関数
 	void LeaveUpdate();
 
+	//弾発射
+	void Fire();
+
 	void Draw(ViewProjection& viewProjection_);
+
+	// 発射間隔
+	static const int32_t kFireInterval = 60;
 
 private:
 
@@ -50,4 +61,9 @@ private:
 	//フェーズ
 	Phase phase_ = Enemy::Phase::Approach;
 
+	//弾
+	std::list<EnemyBullet*> enemyBullets_;
+
+	// 発射タイマー
+	int32_t fireTimer_ = 0;
 };

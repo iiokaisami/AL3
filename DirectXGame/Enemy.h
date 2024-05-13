@@ -6,6 +6,8 @@
 #include "EnemyBullet.h"
 #include <list>
 
+class Player;
+
 class Enemy {
 public:
 
@@ -31,6 +33,10 @@ public:
 
 	// 発射間隔
 	static const int32_t kFireInterval = 60;
+
+	void SetPlayer(Player* player) { player_ = player; }
+
+	Vector3 GetWorldPosition();
 
 private:
 
@@ -66,4 +72,7 @@ private:
 
 	// 発射タイマー
 	int32_t fireTimer_ = 0;
+
+	// 自キャラ
+	Player* player_ = nullptr;
 };

@@ -15,6 +15,16 @@ public:
 
 	bool IsDead() const { return isDead_; }
 
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision();
+
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
+
+	// 半径
+	float GetRadius() { return radius_; }
+
+
 private:
 
 	//ワールド変換データ
@@ -39,5 +49,8 @@ private:
 
 	//デスグラフ
 	bool isDead_ = false;
+
+	// 半径
+	float radius_;
 
 };

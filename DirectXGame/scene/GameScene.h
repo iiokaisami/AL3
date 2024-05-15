@@ -7,6 +7,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "DebugCamera.h"
 #include "Player.h"
 #include "Enemy.h"
 
@@ -42,6 +43,11 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// 衝突判定と応答
+	/// </summary>
+	void CheckAllCollisions();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -56,4 +62,10 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	ViewProjection viewProjection_;
 	Enemy* enemy_ = nullptr;
+
+	//デバッグカメラ有効
+	bool isDebugCameraActive_ = false;
+
+	//デバッグカメラ
+	DebugCamera* debugCamera_ = nullptr;
 };

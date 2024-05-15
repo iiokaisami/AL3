@@ -22,6 +22,8 @@ void Player::Initialize(Model* model, uint32_t font) {
 	input_ = Input::GetInstance();
 
 	calculationMath_ = new CalculationMath;
+
+	radius_ = 2.0f;
 };
 
 void Player::Update() {
@@ -122,9 +124,13 @@ Vector3 Player::GetWorldPosition(){
 	Vector3 worldPos;
 
 	//ワールド座標の平行移動成分を取得(ワールド座標)
-	worldPos.x = worldTransformBlock.translation_.x;
-	worldPos.y = worldTransformBlock.translation_.y;
-	worldPos.z = worldTransformBlock.translation_.z;
+	worldPos.x = worldTransformBlock.matWorld_.m[3][0];
+	worldPos.y = worldTransformBlock.matWorld_.m[3][1];
+	worldPos.z = worldTransformBlock.matWorld_.m[3][2];
 
 	return worldPos;
+}
+
+void Player::OnCollision() {
+	// 何もしない
 }

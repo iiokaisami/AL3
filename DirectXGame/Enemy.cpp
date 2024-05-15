@@ -22,13 +22,15 @@ void Enemy::Initialize(Model* model) {
 
 	worldTransform_.translation_ = {5, 0, 20};
 
-	approachSpeed_ = {0, 0, -0.1f};
+	approachSpeed_ = {0, 0, -0.05f};
 
 	leaveSpeed_ = {-0.2f, 0.1f, -0.2f};
 
 	calculationMath_ = new CalculationMath;
 
 	ApproachInitialize();
+
+	radius_ = 2.0f;
 }
 
 void Enemy::Update(){
@@ -88,7 +90,7 @@ void Enemy::ApproachUpdate(){
 	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
 
 	// 規定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 0.0f) {
+	if (worldTransform_.translation_.z < -100.0f) {
 		phase_ = Enemy::Phase::Leave;
 	}
 }
@@ -141,4 +143,8 @@ Vector3 Enemy::GetWorldPosition() {
 	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
+}
+
+void Enemy::OnCollision(){
+	//何もしない
 }

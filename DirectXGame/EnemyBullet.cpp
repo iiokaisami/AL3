@@ -20,6 +20,8 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 
 	// 引数で受け取った初期座標をリセット
 	worldTransform_.translation_ = position;
+
+	radius_ = 2.0f;
 }
 
 void EnemyBullet::Update() {
@@ -37,4 +39,21 @@ void EnemyBullet::Update() {
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, uv_);
+}
+
+void EnemyBullet::OnCollision() {
+	// デスフラグを立てる
+	isDead_ = true;
+}
+
+Vector3 EnemyBullet::GetWorldPosition() {
+	// ワールド座標を入れる変数
+	Vector3 worldPos;
+
+	// ワールド座標の平行移動成分を取得(ワールド座標)
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
 }

@@ -10,6 +10,7 @@
 #include "DebugCamera.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Skydome.h"
 
 
 /// <summary>
@@ -59,13 +60,20 @@ private: // メンバ変数
 
 	uint32_t texture_;
 	Model* model_ = nullptr;
-	Player* player_ = nullptr;
-	ViewProjection viewProjection_;
-	Enemy* enemy_ = nullptr;
 
 	//デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
 
 	//デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
+
+	Player* player_ = nullptr;
+	ViewProjection viewProjection_;
+	Enemy* enemy_ = nullptr;
+	Skydome* skydome_ = nullptr;
+
+	//3Dモデル
+	Model* modelSkydome_ = nullptr;
+
+	
 };

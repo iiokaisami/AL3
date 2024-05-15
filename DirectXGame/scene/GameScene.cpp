@@ -10,6 +10,8 @@ GameScene::~GameScene() {
 	delete player_; 
 	delete model_;
 	delete enemy_;
+	delete skydome_;
+	delete modelSkydome_;
 }
 
 void GameScene::Initialize() {
@@ -38,6 +40,10 @@ void GameScene::Initialize() {
 	 enemy_ = new Enemy;
 	 enemy_->Initialize(model_);
 	 enemy_->SetPlayer(player_);
+
+	 skydome_->Initialize();
+	 // 3Dモデルの生成
+	 modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 }
 
 void GameScene::Update() { 
@@ -71,6 +77,8 @@ void GameScene::Update() {
 	}
 
 	CheckAllCollisions();
+
+	skydome_->Update();
 }
 
 void GameScene::Draw() {
@@ -104,6 +112,8 @@ void GameScene::Draw() {
 	if (enemy_) {
 		enemy_->Draw(viewProjection_);
 	}
+
+	skydome_->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

@@ -73,7 +73,6 @@ void GameScene::Update() {
 		viewProjection_.UpdateMatrix();
 	}
 
-
 	//自キャラの更新
 	player_->Update();
 

@@ -10,7 +10,6 @@
 #include "DebugCamera.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "Skydome.h"
 
 
 /// <summary>
@@ -70,10 +69,5 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	ViewProjection viewProjection_;
 	Enemy* enemy_ = nullptr;
-	Skydome* skydome_ = nullptr;
-
-	//3Dモデル
-	Model* modelSkydome_ = nullptr;
-
 	
 };

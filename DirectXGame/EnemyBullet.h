@@ -40,7 +40,7 @@ private:
 	uint32_t uv_ = 0u;
 
 	// 速度
-	Vector3 velocity_;
+	Vector3 velocity_ = {0, 0, 0};
 
 	// 発射間隔
 	static const int32_t kFireInterval = 60;
@@ -52,5 +52,5 @@ private:
 	bool isDead_ = false;
 
 	// 半径
-	float radius_;
+	float radius_ = 0;
 };

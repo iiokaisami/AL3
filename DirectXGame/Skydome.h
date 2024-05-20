@@ -6,11 +6,11 @@
 class Skydome {
 public:
 
-	void Initialize();
+	void Initialize(Model* model);
 
 	void Update();
 
-	void Draw();
+	void Draw(const ViewProjection& viewProjection);
 
 private:
 

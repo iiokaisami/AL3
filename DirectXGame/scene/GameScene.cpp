@@ -22,6 +22,9 @@ void GameScene::Initialize() {
 
 	texture_ = TextureManager::Load("debugfont.png");
 	model_ = Model::Create();
+
+	// ビュープロジェクションの初期化
+	viewProjection_.farZ = 300;
 	viewProjection_.Initialize();
 
 	//デバッグカメラの生成
@@ -41,9 +44,11 @@ void GameScene::Initialize() {
 	 enemy_->Initialize(model_);
 	 enemy_->SetPlayer(player_);
 
-	 skydome_->Initialize();
 	 // 3Dモデルの生成
 	 modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+
+	 skydome_ = new Skydome;
+	 skydome_->Initialize(modelSkydome_);
 }
 
 void GameScene::Update() { 
@@ -107,13 +112,12 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	skydome_->Draw(viewProjection_);
 	player_->Draw(viewProjection_);
 
 	if (enemy_) {
 		enemy_->Draw(viewProjection_);
 	}
-
-	skydome_->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

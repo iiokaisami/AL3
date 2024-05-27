@@ -284,6 +284,19 @@ Matrix4x4 CalculationMath::MakePerspectiveFovMatrix(float fovY, float aspectRati
 	return result;
 }
 
+// 正射影行列
+Matrix4x4 CalculationMath::MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
+	Matrix4x4 result;
+	result = {
+	    2 / (right - left),0.0f,0.0f,0.0f,
+	    0.0f,2 / (top - bottom),0.0f,0.0f,
+	    0.0f,0.0f,1 / (farClip - nearClip),0.0f,
+	    (left + right) / (left - right),(top + bottom) / (bottom - top),nearClip / (nearClip - farClip),1.0f,
+	};
+
+	return result;
+}
+
 // ビューポート変換行列
 Matrix4x4 CalculationMath::MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 	Matrix4x4 result;

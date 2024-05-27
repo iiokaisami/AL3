@@ -12,6 +12,7 @@ GameScene::~GameScene() {
 	delete enemy_;
 	delete skydome_;
 	delete modelSkydome_;
+	delete railCamera_;
 }
 
 void GameScene::Initialize() {
@@ -27,6 +28,7 @@ void GameScene::Initialize() {
 	viewProjection_.farZ = 300;
 	viewProjection_.Initialize();
 
+
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 
@@ -38,7 +40,8 @@ void GameScene::Initialize() {
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
-	 player_->Initialize(model_, texture_);
+	Vector3 playerPosition(0, 0, 20.0f);
+	player_->Initialize(model_, texture_,playerPosition);
 
 	 enemy_ = new Enemy;
 	 enemy_->Initialize(model_);
@@ -49,6 +52,12 @@ void GameScene::Initialize() {
 
 	 skydome_ = new Skydome;
 	 skydome_->Initialize(modelSkydome_);
+
+	 railCamera_ = new RailCamera;
+	 railCamera_->Initialize({0, 0, -30}, {0, 0, 0});
+
+	 //自キャラとレールカメラの親子関係を結ぶ
+	 player_->SetParent(&railCamera_->GetWorldTransform());
 }
 
 void GameScene::Update() { 
@@ -73,6 +82,13 @@ void GameScene::Update() {
 		viewProjection_.UpdateMatrix();
 	}
 
+	railCamera_->Update();
+
+	 viewProjection_.matView = railCamera_->GetViewProjection().matView;
+	 viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+	 viewProjection_.TransferMatrix();
+
+
 	//自キャラの更新
 	player_->Update();
 
@@ -83,6 +99,8 @@ void GameScene::Update() {
 	CheckAllCollisions();
 
 	skydome_->Update();
+
+	
 }
 
 void GameScene::Draw() {

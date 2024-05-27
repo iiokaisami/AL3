@@ -11,7 +11,7 @@ class Player {
 public:
 	~Player();
 
-	void Initialize(Model* model, uint32_t font);
+	void Initialize(Model* model, uint32_t font,Vector3 position);
 
 	void Update();
 
@@ -30,6 +30,8 @@ public:
 
 	//半径
 	float GetRadius() { return radius_; }
+
+	void SetParent(const WorldTransform* parent);
 
 private:
 	// ワールド変換データ
@@ -50,4 +52,5 @@ private:
 
 	//半径
 	float radius_;
+
 };

@@ -87,7 +87,7 @@ void Enemy::ApproachUpdate(){
 	}
 	
 	// 移動(ベクトルを加算)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
+	//worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
 
 	// 規定の位置に到達したら離脱
 	if (worldTransform_.translation_.z < -20.0f) {

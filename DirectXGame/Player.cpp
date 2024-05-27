@@ -9,7 +9,7 @@ Player::~Player() {
 	}
 }
 
-void Player::Initialize(Model* model, uint32_t font) {
+void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
 
 	// NULLポインタチェック
 	assert(model);
@@ -17,6 +17,8 @@ void Player::Initialize(Model* model, uint32_t font) {
 	font_ = font;
 
 	worldTransformBlock.Initialize();
+
+	worldTransformBlock.translation_ = position;
 
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -50,28 +52,37 @@ void Player::Update() {
 
 	// 押した方向で移動ベクトルを変更
 	if (input_->PushKey(DIK_A)) {
+
 		worldTransformBlock.rotation_.y += kRotSpeed;
+
 	} else if (input_->PushKey(DIK_D)) {
+
 		worldTransformBlock.rotation_.y -= kRotSpeed;
 	}
 
 	// 押した方向で移動ベクトルを変更（左右）
 	if (input_->PushKey(DIK_LEFT)) {
+
 		move.x -= kCharacterSpeed;
+
 	} else if (input_->PushKey(DIK_RIGHT)) {
+		
 		move.x += kCharacterSpeed;
 	}
 
 	// 押した方向で移動ベクトルを変更（上下）
 	if (input_->PushKey(DIK_DOWN)) {
+
 		move.y -= kCharacterSpeed;
+	
 	} else if (input_->PushKey(DIK_UP)) {
+
 		move.y += kCharacterSpeed;
 	}
 
 	// 移動限界座標
-	const float kMoveLimitX = 34;
-	const float kMoveLimitY = 18;
+	const float kMoveLimitX = 10;
+	const float kMoveLimitY = 6;
 
 	// 範囲を超えない処理
 	worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
@@ -103,7 +114,7 @@ void Player::Attack() {
 
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTransformBlock.translation_,velocity);
+		newBullet->Initialize(model_, GetWorldPosition(), velocity);
 
 		// 弾を登録する
 		bullets_.push_back(newBullet);
@@ -133,4 +144,8 @@ Vector3 Player::GetWorldPosition(){
 
 void Player::OnCollision() {
 	// 何もしない
+}
+
+void Player::SetParent(const WorldTransform* parent) {
+	worldTransformBlock.parent_ = parent;
 }

@@ -21,10 +21,16 @@ void RailCamera::Initialize(Vector3 worldMatrix,Vector3 rotation) {
 
 void RailCamera::Update() { 
 	//カメラの座標を画面表示する処理
+#ifdef DEBUG
+
 	ImGui::Begin("Camera");
 	ImGui::SliderFloat3("translation", &worldTransform_.translation_.x, 0.0f, 300.0f);
 	ImGui::SliderFloat3("rotation", &worldTransform_.rotation_.x, 0.0f, 180.0f);
 	ImGui::End();
+
+#endif // DEBUG
+
+	
 
 	Vector3 railCameraSpeed = {0, 0, 0.1f};
 	Vector3 rotation = {0, 0.001f, 0};

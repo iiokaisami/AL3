@@ -8,12 +8,15 @@
 
 class Player;
 
+//GameSceneの前方宣言
+class GameScene;
+
 class Enemy {
 public:
 
 	~Enemy();
 
-	void Initialize(Model* model);
+	void Initialize(Model* model, Vector3 position);
 
 	void Update();
 
@@ -41,12 +44,18 @@ public:
 	// 衝突を検出したら呼び出されるコールバック関数
 	void OnCollision();
 
-	// 弾リストを取得
-	const std::list<EnemyBullet*>& GetBullets() const { return enemyBullets_; }
-
 	// 半径
 	float GetRadius() { return radius_; }
 
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
+	bool isDeath() { return isDeath_; }
+
+	Vector3 GetVelocity() { return velocity_; }
+
+	bool GetIsFire() { return isFire; }
+
+	bool SetIsFire(bool fire) { return isFire = fire; }
 
 private:
 
@@ -63,10 +72,10 @@ private:
 	CalculationMath* calculationMath_ = nullptr;
 
 	//接近フェーズ速度
-	Vector3 approachSpeed_;
+	Vector3 approachSpeed_ = {0.0f, 0.0f, 0.0f};
 
 	//離脱フェーズ速度
-	Vector3 leaveSpeed_;
+	Vector3 leaveSpeed_ = {0.0f, 0.0f, 0.0f};
 
 	//行動フェーズ
 	enum class Phase {
@@ -77,9 +86,7 @@ private:
 	//フェーズ
 	Phase phase_ = Enemy::Phase::Approach;
 
-	//弾
-	std::list<EnemyBullet*> enemyBullets_;
-
+	
 	// 発射タイマー
 	int32_t fireTimer_ = 0;
 
@@ -87,5 +94,17 @@ private:
 	Player* player_ = nullptr;
 
 	// 半径
-	float radius_;
+	float radius_ = 0.0f;
+
+	//ゲームシーン
+	GameScene* gameScene_ = nullptr;
+
+	//デスフラグ
+	bool isDeath_ = false;
+
+	// 弾速度
+	Vector3 velocity_ = {0, 0, 0};
+
+	//発射フラグ
+	bool isFire = false;
 };

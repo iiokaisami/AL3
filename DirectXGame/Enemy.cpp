@@ -5,13 +5,9 @@
 
 Enemy::~Enemy() { 
 	delete calculationMath_;
-
-	for (EnemyBullet* bullet : enemyBullets_) {
-		delete bullet;
-	}
 }
 
-void Enemy::Initialize(Model* model) {
+void Enemy::Initialize(Model* model, Vector3 position) {
 
 	// NULLポインタチェック
 	assert(model);
@@ -20,7 +16,7 @@ void Enemy::Initialize(Model* model) {
 
 	worldTransform_.Initialize();
 
-	worldTransform_.translation_ = {5, 0, 20};
+	worldTransform_.translation_ = position;
 
 	approachSpeed_ = {0, 0, -0.05f};
 
@@ -31,18 +27,11 @@ void Enemy::Initialize(Model* model) {
 	ApproachInitialize();
 
 	radius_ = 2.0f;
+
+	isDeath_ = false;
 }
 
 void Enemy::Update(){
-
-	// デスフラグの立った弾を削除
-	enemyBullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->IsDead() == true) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
 
 	switch (phase_) {
 	case Enemy::Phase::Approach:
@@ -62,10 +51,7 @@ void Enemy::Update(){
 
 	worldTransform_.UpdateMatrix();
 
-	// 弾更新
-	for (EnemyBullet* bullet : enemyBullets_) {
-		bullet->Update();
-	}
+	
 }
 
 void Enemy::ApproachInitialize() {
@@ -80,6 +66,8 @@ void Enemy::ApproachUpdate(){
 	// 指定時間に達した
 	if (fireTimer_ <= 0)
 	{
+		isFire = true;
+
 		//弾を発射
 		Fire();
 
@@ -93,6 +81,7 @@ void Enemy::ApproachUpdate(){
 	if (worldTransform_.translation_.z < -20.0f) {
 		phase_ = Enemy::Phase::Leave;
 	}
+
 }
 
 void Enemy::LeaveUpdate() {
@@ -101,36 +90,24 @@ void Enemy::LeaveUpdate() {
 }
 
 void Enemy::Fire() {
-		// 弾の速度
-		const float kBulletSpeed = 1.0f;
-		Vector3 velocity(0, 0, kBulletSpeed);
+	// 弾の速度
+	const float kBulletSpeed = 1.0f;
+	velocity_ = {0, 0, kBulletSpeed};
 
-		//自キャラのワールド座標を取得する
-		Vector3 startPos = player_->GetWorldPosition();
-	    //敵キャラのワールド座標を取得する
-	    Vector3 goalPos = GetWorldPosition();
-		//敵キャラ->自キャラの差分ベクトルを求める
-	    Vector3 differenceVector = calculationMath_->Subtract(startPos, goalPos);
-		//ベクトルの正規化
-	    Vector3 normalVec = calculationMath_->Normalize(differenceVector);
-		//ベクトルの長さを、速さに合わせる
-	    velocity = calculationMath_->Multiply(kBulletSpeed, normalVec);
-
-		// 弾を生成し、初期化
-		EnemyBullet* newBullet = new EnemyBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
-
-		// 弾を登録する
-		enemyBullets_.push_back(newBullet);	
+	// 自キャラのワールド座標を取得する
+	Vector3 startPos = player_->GetWorldPosition();
+	// 敵キャラのワールド座標を取得する
+	Vector3 goalPos = GetWorldPosition();
+	// 敵キャラ->自キャラの差分ベクトルを求める
+	Vector3 differenceVector = calculationMath_->Subtract(startPos, goalPos);
+	// ベクトルの正規化
+	Vector3 normalVec = calculationMath_->Normalize(differenceVector);
+	// ベクトルの長さを、速さに合わせる
+	velocity_ = calculationMath_->Multiply(kBulletSpeed, normalVec);
 }
 
 void Enemy::Draw(ViewProjection& viewProjection_) {
 	model_->Draw(worldTransform_, viewProjection_, kamata_);
-
-	// 弾描画
-	for (EnemyBullet* bullet : enemyBullets_) {
-		bullet->Draw(viewProjection_);
-	}
 }
 
 Vector3 Enemy::GetWorldPosition() { 
@@ -145,6 +122,6 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::OnCollision(){
-	//何もしない
+void Enemy::OnCollision(){ 
+	isDeath_ = true;
 }

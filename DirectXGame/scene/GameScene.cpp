@@ -67,6 +67,9 @@ void GameScene::Initialize() {
 
 	 //自キャラとレールカメラの親子関係を結ぶ
 	 player_->SetParent(&railCamera_->GetWorldTransform());
+
+	 //レティクルのテクスチャ
+	 TextureManager::Load("reticle.png");
 }
 
 void GameScene::Update() { 
@@ -205,6 +208,8 @@ void GameScene::Draw() {
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
+
+	player_->DrawUI();
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる

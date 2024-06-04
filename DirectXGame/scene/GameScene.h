@@ -81,7 +81,7 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 
-	uint32_t texture_;
+	uint32_t texture_ = 0;
 	Model* model_ = nullptr;
 
 	//デバッグカメラ有効

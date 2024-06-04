@@ -6,6 +6,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <list>
+#include "Sprite.h"
 
 class Player {
 public:
@@ -15,7 +16,7 @@ public:
 
 	void Update();
 
-	void Draw(ViewProjection& viewProjection_);
+	void Draw(ViewProjection& viewProjection);
 
 	void Attack();
 
@@ -32,6 +33,11 @@ public:
 	float GetRadius() { return radius_; }
 
 	void SetParent(const WorldTransform* parent);
+
+    /// <summary>
+    /// Ui描画
+    /// </summary>
+	void DrawUI();
 
 private:
 	// ワールド変換データ
@@ -52,5 +58,13 @@ private:
 
 	//半径
 	float radius_;
+
+	// 3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
+
+	//2Dレティクル用のスプライト
+	Sprite* sprite2DReticle_ = nullptr;
+
+	ViewProjection viewProjection_;
 
 };

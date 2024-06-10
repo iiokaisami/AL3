@@ -2,9 +2,12 @@
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "CalculationMath.h"
 
 class Skydome {
 public:
+
+	~Skydome();
 
 	void Initialize(Model* model);
 
@@ -19,4 +22,6 @@ private:
 
 	// モデル
 	Model* model_ = nullptr;
+
+	CalculationMath* calculationMath_ = nullptr;
 };

@@ -57,7 +57,7 @@ private:
 	std::list<PlayerBullet*> bullets_;
 
 	//半径
-	float radius_;
+	float radius_ = 0;
 
 	// 3Dレティクル用ワールドトランスフォーム
 	WorldTransform worldTransform3DReticle_;

@@ -12,7 +12,7 @@ void RailCamera::Initialize(Vector3 worldMatrix,Vector3 rotation) {
 	worldTransform_.rotation_ = rotation;
 
 	// ビュープロジェクションの初期化
-	viewProjection_.farZ = 300;
+	viewProjection_.farZ = 800;
 	viewProjection_.Initialize();
 
 	//数字関数
@@ -33,10 +33,10 @@ void RailCamera::Update() {
 	
 
 	Vector3 railCameraSpeed = {0, 0, 0.05f};
-	Vector3 rotation = {0, 0.0f, 0};
+	Vector3 rotation = {0, 0.000f, 0};
 
 	//ワールドトランスフォームの座標の数値を加算したりする(移動)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, railCameraSpeed);
+	//worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, railCameraSpeed);
 	//worldTransform_.translation_ = calculationMath_->Subtract(worldTransform_.translation_, railCameraSpeed);
 
 	//ワールドトランスフォームの角度の数値を加算したりする(回転)

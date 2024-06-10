@@ -51,6 +51,6 @@ private:
 	bool isDead_ = false;
 
 	// 半径
-	float radius_;
+	float radius_ = 0;
 
 };

@@ -34,7 +34,7 @@ void GameScene::Initialize() {
 	model_ = Model::Create();
 
 	// ビュープロジェクションの初期化
-	viewProjection_.farZ = 300;
+	viewProjection_.farZ = 800;
 	viewProjection_.Initialize();
 
 

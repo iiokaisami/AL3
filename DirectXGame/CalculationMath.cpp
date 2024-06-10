@@ -329,3 +329,13 @@ Vector3 CalculationMath::TransformNormal(const Vector3& vel, const Matrix4x4& ma
 
 	return result;
 }
+
+float CalculationMath::Length(const Vector3& v1, const Vector3& v2) {
+	Vector3 distance;
+	float d;
+
+	distance = Subtract(v2, v1);
+	d = sqrtf(powf(distance.x, 2) + powf(distance.y, 2) + powf(distance.z, 2));
+
+	return d;
+}

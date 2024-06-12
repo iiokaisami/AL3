@@ -244,10 +244,6 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 	 // ゲームパッド未接続なら何もせずに抜ける
 	 if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
-		 return;
-	 }
-	 else
-	 {
 		 POINT mousePosition;
 		 // マウス座標（スクリーン座標）を取得する
 		 GetCursorPos(&mousePosition);
@@ -274,7 +270,6 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 		 // カメラから標準オブジェクトの距離
 		 const float kDistanceTestObject = 60;
 		 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, mouseDirection), posNear);
-	 
 
 		 ImGui::Begin("Player");
 
@@ -284,7 +279,10 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 		 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
 
 		 ImGui::End();
+		 
+		 return;
 	 }
+
 
 	 // ジョイスティック状態取得
 	 if (Input::GetInstance()->GetJoystickState(0, joyState)) {

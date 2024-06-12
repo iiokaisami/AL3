@@ -122,15 +122,11 @@ void Player::Update(ViewProjection& viewProjection) {
 	worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
 
 
-
 	// ビューポート行列
 	Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	
-
 	// スプライトの現在座標を取得
 	Vector2 spritePosition = sprite2DReticle_->GetPosition();
-
-	//XINPUT_STATE joyState;
 
 	//ジョイスティック状態取得
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
@@ -244,9 +240,9 @@ void Player::DrawUI() {
 	sprite2DReticle_->Draw();
 }
 
+// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
 void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
-	/////マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置////////
-
+	
 	 POINT mousePosition;
 	// マウス座標（スクリーン座標）を取得する
 	 GetCursorPos(&mousePosition);
@@ -278,7 +274,7 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 mouseDirection = calculationMath_->Normalize(mouseDirection);
 
 	// カメラから標準オブジェクトの距離
-	 const float kDistanceTestObject = 50;
+	 const float kDistanceTestObject = 60;
 	 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, mouseDirection), posNear);
 
 	 worldTransform3DReticle_.UpdateMatrix();
@@ -291,4 +287,5 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
 
 	 ImGui::End();
+
 }

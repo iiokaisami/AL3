@@ -39,6 +39,7 @@ public:
     /// </summary>
 	void DrawUI();
 
+	// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
 	void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 private:

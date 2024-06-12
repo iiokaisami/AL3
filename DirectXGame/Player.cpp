@@ -45,7 +45,7 @@ void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
 
 };
 
-void Player::Update() {
+void Player::Update(ViewProjection& viewProjection) {
 
 	worldTransformBlock.UpdateMatrix();
 
@@ -111,46 +111,50 @@ void Player::Update() {
 	worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
 
 
-	/////自機のワールド座標から3Dレティクルのワールド座標を計算////////
+	////////////////自機のワールド座標から3Dレティクルのワールド座標を計算///////////////////
 
-	//自機から3Dレティクルへの距離
+	// 自機から3Dレティクルへの距離
 	const float kDistancePlayerTo3DReticle = 50.0f;
 
-	//自機から3Dレティクルへのオフセット(Z+向き)
-	Vector3 offset = {0, 0, 1.0f};
+	// 自機から3Dレティクルへのオフセット(Z+向き)
+	Vector3 offset = {0, 0, kDistancePlayerTo3DReticle};
 
-	//自機のワールド行列の回転を反映
-	offset = calculationMath_->TransformNormal(offset, worldTransformBlock.matWorld_);
+	// 自機のワールド行列の回転を反映
+	offset = calculationMath_->Transform(offset, worldTransformBlock.matWorld_);
 
-	//ベクトルの長さを整える
+	// ベクトルの長さを整える
 	offset = calculationMath_->Multiply(kDistancePlayerTo3DReticle, calculationMath_->Normalize(offset));
 
-	//3Dレティクルの座標を設定
-	worldTransform3DReticle_.translation_ = calculationMath_->Transform(offset, worldTransformBlock.matWorld_);
+	// 3Dレティクルの座標を設定
+	worldTransform3DReticle_.translation_ = calculationMath_->Add(GetWorldPosition(), offset);
 	worldTransform3DReticle_.UpdateMatrix();
 
-	///////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
 
 
 
-	/////自機のワールド座標から3Dレティクルのワールド座標を計算////////
 
-	Vector3 positionReticle = worldTransform3DReticle_.translation_;
+   ///////3Dレコードレティクルのワールド座標から2Dレティクルのスクリーン座標を計算//////
 
-	//ビューポート行列
-	Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0,WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	Vector3 positionReticle;
 
-	//ビュー行列とプロジェクション行列、ビューポート行列を合成する
-	Matrix4x4 matViewProjectionViewport =
-		calculationMath_->Multiply(viewProjection_.matView, calculationMath_->Multiply(viewProjection_.matProjection, matViewPort));
+	positionReticle.x = worldTransform3DReticle_.matWorld_.m[3][0];
+	positionReticle.y = worldTransform3DReticle_.matWorld_.m[3][1];
+	positionReticle.z = worldTransform3DReticle_.matWorld_.m[3][2];
 
-	//ワールド→スクリーン座標変換(ここで3Dから2Dになる)
+	// ビューポート行列
+	Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix4x4 matViewProjectionViewport = calculationMath_->Multiply(calculationMath_->Multiply(viewProjection.matView, viewProjection.matProjection), matViewPort);
+
+	// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
 	positionReticle = calculationMath_->Transform(positionReticle, matViewProjectionViewport);
 
-	//スプライトのレティクルに座標設定
+	// スプライトのレティクルに座標設定
 	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
 
-	///////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -175,7 +179,7 @@ void Player::Attack() {
 		//velocity = calculationMath_->TransformNormal(velocity, worldTransformBlock.matWorld_);
 
 		//自機から標準オブジェクトへのベクトル
-		velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, worldTransformBlock.rotation_);
+		velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
 		velocity = calculationMath_->Multiply(kBulletSpeed, calculationMath_->Normalize(velocity));
 
 
@@ -197,7 +201,7 @@ void Player::Draw(ViewProjection& viewProjection) {
 	}
 
 	//3Dレティクルを描画
-	//model_->Draw(worldTransform3DReticle_, viewProjection);
+	model_->Draw(worldTransform3DReticle_, viewProjection);
 };
 
 Vector3 Player::GetWorldPosition(){

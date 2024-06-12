@@ -14,7 +14,7 @@ public:
 
 	void Initialize(Model* model, uint32_t font,Vector3 position);
 
-	void Update();
+	void Update(ViewProjection& viewProjection);
 
 	void Draw(ViewProjection& viewProjection);
 

@@ -14,7 +14,7 @@ public:
 
 	void Initialize(Model* model, uint32_t font,Vector3 position);
 
-	void Update();
+	void Update(ViewProjection& viewProjection);
 
 	void Draw(ViewProjection& viewProjection);
 
@@ -38,6 +38,8 @@ public:
     /// Ui描画
     /// </summary>
 	void DrawUI();
+
+	void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 private:
 	// ワールド変換データ

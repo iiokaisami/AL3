@@ -76,7 +76,7 @@ void GameScene::Update() {
 
 	#ifdef _DEBUG
 	if (input_->TriggerKey(DIK_P)) {
-		isDebugCameraActive_ = true;
+		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 #endif // _DEBUG
 
@@ -92,17 +92,17 @@ void GameScene::Update() {
 	} else {
 	//ビュープロジェクション行列の更新と転送
 		viewProjection_.UpdateMatrix();
+
+		railCamera_->Update();
+
+		viewProjection_.matView = railCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
 	}
-
-	railCamera_->Update();
-
-	 viewProjection_.matView = railCamera_->GetViewProjection().matView;
-	 viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
-	 viewProjection_.TransferMatrix();
 
 
 	//自キャラの更新
-	player_->Update();
+	player_->Update(viewProjection_);
 
 	UpdateEnemyPopCommands();
 

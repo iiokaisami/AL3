@@ -36,7 +36,7 @@ void RailCamera::Update() {
 	Vector3 rotation = {0, 0.000f, 0};
 
 	//ワールドトランスフォームの座標の数値を加算したりする(移動)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, railCameraSpeed);
+	//worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, railCameraSpeed);
 	//worldTransform_.translation_ = calculationMath_->Subtract(worldTransform_.translation_, railCameraSpeed);
 
 	//ワールドトランスフォームの角度の数値を加算したりする(回転)

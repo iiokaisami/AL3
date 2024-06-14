@@ -33,7 +33,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 void Enemy::Update(){
 
-	switch (phase_) {
+	/* switch (phase_) {
 	case Enemy::Phase::Approach:
 	default:
 		
@@ -47,12 +47,18 @@ void Enemy::Update(){
 		Enemy::LeaveUpdate();
 		
 		break;
-	}
+	}*/
+	(this->*phase_)();
 
 	worldTransform_.UpdateMatrix();
 
 	
 }
+
+void (Enemy::*Enemy::phase_[])() = {
+    &Enemy::ApproachUpdate, // 要素番号0
+    &Enemy::LeaveUpdate     // 要素番号1
+};
 
 void Enemy::ApproachInitialize() {
 	//発射タイマーを初期化
@@ -75,11 +81,13 @@ void Enemy::ApproachUpdate(){
 	}
 	
 	// 移動(ベクトルを加算)
-	//worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
+	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
 
 	// 規定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < -20.0f) {
-		phase_ = Enemy::Phase::Leave;
+	if (worldTransform_.translation_.z < 0.0f) {
+		//phase_ = Enemy::Phase::Leave;
+	
+		this->*phase_[1]();
 	}
 
 }

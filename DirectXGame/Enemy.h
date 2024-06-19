@@ -78,18 +78,16 @@ private:
 	Vector3 leaveSpeed_ = {0.0f, 0.0f, 0.0f};
 
 	//行動フェーズ
-	/*enum class Phase {
+	enum class Phase {
 		Approach, // 接近する
 		Leave,    // 離脱する
 	};
 
 	//フェーズ
 	Phase phase_ = Enemy::Phase::Approach;
-	*/
 
-	static_cast<size_t>(phase_);
+	static void (Enemy::*p[])();
 
-	static void (Enemy::*phase_[])();
 
 
 	

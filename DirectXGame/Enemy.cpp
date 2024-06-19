@@ -48,14 +48,15 @@ void Enemy::Update(){
 		
 		break;
 	}*/
-	(this->*phase_)();
+	
+	(this->*p[static_cast<size_t>(phase_)])();
 
 	worldTransform_.UpdateMatrix();
 
 	
 }
 
-void (Enemy::*Enemy::phase_[])() = {
+void (Enemy::*Enemy::p[])() = {
     &Enemy::ApproachUpdate, // 要素番号0
     &Enemy::LeaveUpdate     // 要素番号1
 };
@@ -63,6 +64,8 @@ void (Enemy::*Enemy::phase_[])() = {
 void Enemy::ApproachInitialize() {
 	//発射タイマーを初期化
 	fireTimer_ = kFireInterval;
+
+	 phase_ = Enemy::Phase::Approach;
 }
 
 void Enemy::ApproachUpdate(){
@@ -84,10 +87,10 @@ void Enemy::ApproachUpdate(){
 	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
 
 	// 規定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 0.0f) {
+	if (worldTransform_.translation_.z < 5.0f) {
 		//phase_ = Enemy::Phase::Leave;
-	
-		this->*phase_[1]();
+		
+	    phase_ = Enemy::Phase::Leave;
 	}
 
 }

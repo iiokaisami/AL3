@@ -271,6 +271,8 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 		 const float kDistanceTestObject = 60;
 		 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, mouseDirection), posNear);
 
+		  worldTransform3DReticle_.UpdateMatrix();
+
 		 ImGui::Begin("Player");
 
 		 ImGui::Text("2DReticle:(%.2f,%.2f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);

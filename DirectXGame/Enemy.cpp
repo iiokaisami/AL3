@@ -2,6 +2,9 @@
 #include "cassert"
 #include "TextureManager.h"
 #include "Player.h"
+#include "EnemyStateApproach.h";
+#include "EnemyStateLeave.h";
+
 
 Enemy::~Enemy() { 
 	delete calculationMath_;
@@ -18,9 +21,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 	worldTransform_.translation_ = position;
 
-	approachSpeed_ = {0, 0, -0.05f};
-
-	leaveSpeed_ = {-0.2f, 0.1f, -0.2f};
+	vel_ = {0, 0, 0};
 
 	calculationMath_ = new CalculationMath;
 
@@ -29,6 +30,8 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 	radius_ = 2.0f;
 
 	isDeath_ = false;
+
+	ChangeState(std::make_unique<EnemyStateApproach>(this));
 }
 
 void Enemy::Update(){
@@ -49,26 +52,44 @@ void Enemy::Update(){
 		break;
 	}*/
 	
-	(this->*p[static_cast<size_t>(phase_)])();
+	//(this->*p[static_cast<size_t>(phase_)])();
+
+	// 発射タイマーカウントダウン
+	fireTimer_--;
+
+	// 指定時間に達した
+	if (fireTimer_ <= 0) {
+		isFire = true;
+
+		// 弾を発射
+		Fire();
+
+		fireTimer_ = kFireInterval;
+	}
+
+	// 移動(ベクトルを加算)
+	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
+
+
 
 	worldTransform_.UpdateMatrix();
 
 	
 }
 
-void (Enemy::*Enemy::p[])() = {
+/* void (Enemy::*Enemy::p[])() = {
     &Enemy::ApproachUpdate, // 要素番号0
     &Enemy::LeaveUpdate     // 要素番号1
 };
 
-void Enemy::ApproachInitialize() {
+ void Enemy::ApproachInitialize() {
 	//発射タイマーを初期化
 	fireTimer_ = kFireInterval;
 
 	 phase_ = Enemy::Phase::Approach;
 }
 
-void Enemy::ApproachUpdate(){
+ void Enemy::ApproachUpdate() {
 	//発射タイマーカウントダウン
 	fireTimer_--;
 
@@ -84,10 +105,10 @@ void Enemy::ApproachUpdate(){
 	}
 	
 	// 移動(ベクトルを加算)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, approachSpeed_);
+	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
 
 	// 規定の位置に到達したら離脱
-	if (worldTransform_.translation_.z < 5.0f) {
+	 if (worldTransform_.translation_.z < 5.0f) {
 		//phase_ = Enemy::Phase::Leave;
 		
 	    phase_ = Enemy::Phase::Leave;
@@ -95,10 +116,10 @@ void Enemy::ApproachUpdate(){
 
 }
 
-void Enemy::LeaveUpdate() {
+ void Enemy::LeaveUpdate() {
 	// 移動(ベクトルを加算)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, leaveSpeed_);
-}
+	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
+}*/
 
 void Enemy::Fire() {
 	// 弾の速度
@@ -135,4 +156,11 @@ Vector3 Enemy::GetWorldPosition() {
 
 void Enemy::OnCollision(){ 
 	isDeath_ = true;
+}
+
+
+//StatePattern
+void Enemy::ChangeState(std::unique_ptr<BaseEnemyState> state) 
+{
+	state_ = std::move(state);
 }

@@ -4,7 +4,9 @@
 #include "WorldTransform.h"
 #include "CalculationMath.h"
 #include "EnemyBullet.h"
+#include "BaseEnemyState.h";
 #include <list>
+
 
 class Player;
 
@@ -24,10 +26,10 @@ public:
 	void ApproachInitialize();
 
 	// 接近フェーズ更新関数
-	void ApproachUpdate();
+	//void ApproachUpdate();
 
 	// 離脱フェーズ更新関数
-	void LeaveUpdate();
+	//void LeaveUpdate();
 
 	//弾発射
 	void Fire();
@@ -57,6 +59,13 @@ public:
 
 	bool SetIsFire(bool fire) { return isFire = fire; }
 
+
+	//StatePattern
+	void ChangeState(std::unique_ptr<BaseEnemyState> state);
+
+	void SetVel(const Vector3& vel) { vel_ = vel; }
+
+
 private:
 
 	// ワールド変換データ
@@ -71,14 +80,9 @@ private:
 	
 	CalculationMath* calculationMath_ = nullptr;
 
-	//接近フェーズ速度
-	Vector3 approachSpeed_ = {0.0f, 0.0f, 0.0f};
-
-	//離脱フェーズ速度
-	Vector3 leaveSpeed_ = {0.0f, 0.0f, 0.0f};
 
 	//行動フェーズ
-	enum class Phase {
+	/* enum class Phase {
 		Approach, // 接近する
 		Leave,    // 離脱する
 	};
@@ -86,11 +90,14 @@ private:
 	//フェーズ
 	Phase phase_ = Enemy::Phase::Approach;
 
-	static void (Enemy::*p[])();
+	static void (Enemy::*p[])();*/
 
-
+	std::unique_ptr<BaseEnemyState> state_;
 
 	
+    Vector3 vel_ = {0, 0, 0};
+
+
 	// 発射タイマー
 	int32_t fireTimer_ = 0;
 

@@ -280,6 +280,8 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 		 ImGui::Text("Far:(%+.2f,%+.2f,%+.2f)", posFar.x, posFar.y, posFar.z);
 		 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
 
+		 ImGui::Text("w:(%+.2f,%+.2f,%+.2f)", GetWorldPosition().x, GetWorldPosition().y, GetWorldPosition().z);
+
 		 ImGui::End();
 		 
 		 return;

@@ -4,7 +4,7 @@
 #include "WorldTransform.h"
 #include "CalculationMath.h"
 #include "EnemyBullet.h"
-#include "BaseEnemyState.h";
+#include "BaseEnemyState.h"
 #include <list>
 
 
@@ -23,7 +23,7 @@ public:
 	void Update();
 
 	//接近フェーズ初期化
-	void ApproachInitialize();
+	//void ApproachInitialize();
 
 	// 接近フェーズ更新関数
 	//void ApproachUpdate();

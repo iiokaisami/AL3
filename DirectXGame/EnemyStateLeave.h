@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseEnemyState.h";
+#include "BaseEnemyState.h"
 
 class EnemyStateLeave : public BaseEnemyState {
 public:

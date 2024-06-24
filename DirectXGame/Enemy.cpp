@@ -2,8 +2,8 @@
 #include "cassert"
 #include "TextureManager.h"
 #include "Player.h"
-#include "EnemyStateApproach.h";
-#include "EnemyStateLeave.h";
+#include "EnemyStateApproach.h"
+#include "EnemyStateLeave.h"
 
 
 Enemy::~Enemy() { 
@@ -25,7 +25,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 	calculationMath_ = new CalculationMath;
 
-	ApproachInitialize();
+	//ApproachInitialize();
 
 	radius_ = 2.0f;
 
@@ -66,6 +66,8 @@ void Enemy::Update(){
 
 		fireTimer_ = kFireInterval;
 	}
+
+	state_->Update();
 
 	// 移動(ベクトルを加算)
 	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);

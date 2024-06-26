@@ -8,6 +8,10 @@
 
 Enemy::~Enemy() { 
 	delete calculationMath_;
+
+	for (TimeCall* timeCall : timeCalls_) {
+		delete timeCall;
+	}
 }
 
 void Enemy::Initialize(Model* model, Vector3 position) {
@@ -59,13 +63,27 @@ void Enemy::Update(){
 
 	// 指定時間に達した
 	if (fireTimer_ <= 0) {
-		isFire = true;
-
-		// 弾を発射
-		Fire();
-
-		fireTimer_ = kFireInterval;
+		
+		TimeReset();
+		
+		SetFireTimer();
 	}
+
+
+	timeCalls_.remove_if([](TimeCall* timeCall) {
+		if (timeCall->IsFinished() == true) {
+			delete timeCall;
+			return true;
+		}
+		return false;
+	});
+
+	for (TimeCall* timeCall : timeCalls_)
+	{
+		timeCall->Update();
+	}
+
+	
 
 	state_->Update();
 
@@ -162,7 +180,22 @@ void Enemy::OnCollision(){
 
 
 //StatePattern
-void Enemy::ChangeState(std::unique_ptr<BaseEnemyState> state) 
-{
-	state_ = std::move(state);
+void Enemy::ChangeState(std::unique_ptr<BaseEnemyState> state) {
+	state_ = std::move(state); 
+}
+
+void Enemy::TimeReset() {
+
+	isFire = true;
+
+	// 弾を発射
+	Fire();
+
+	//timeCalls_.push_back(new TimeCall(std::bind(&Enemy::TimeReset, this, kFireInterval)));
+
+    std::function<void(void)> callback = std::bind(&Enemy::TimeReset, this);
+
+	TimeCall* timedCall = new TimeCall(callback, kFireInterval);
+
+	timeCalls_.push_back(timedCall);
 }

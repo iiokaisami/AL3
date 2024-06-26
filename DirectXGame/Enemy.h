@@ -5,6 +5,7 @@
 #include "CalculationMath.h"
 #include "EnemyBullet.h"
 #include "BaseEnemyState.h"
+#include "TimeCall.h"
 #include <list>
 
 
@@ -65,6 +66,12 @@ public:
 
 	void SetVel(const Vector3& vel) { vel_ = vel; }
 
+	int32_t SetFireTimer() { return fireTimer_ = kFireInterval; }
+
+
+	//コールバック関数
+	void TimeReset();
+
 
 private:
 
@@ -118,4 +125,6 @@ private:
 
 	//発射フラグ
 	bool isFire = false;
+
+	std::list<TimeCall*> timeCalls_;
 };

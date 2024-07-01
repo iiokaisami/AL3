@@ -29,8 +29,6 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 	calculationMath_ = new CalculationMath;
 
-	//ApproachInitialize();
-
 	radius_ = 2.0f;
 
 	isDeath_ = false;
@@ -39,36 +37,8 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 }
 
 void Enemy::Update(){
-
-	/* switch (phase_) {
-	case Enemy::Phase::Approach:
-	default:
-		
-		//接近フェーズ更新関数
-		Enemy::ApproachUpdate();
-		
-		break;
-	case Enemy::Phase::Leave:
-
-		// 離脱フェーズ更新関数
-		Enemy::LeaveUpdate();
-		
-		break;
-	}*/
 	
-	//(this->*p[static_cast<size_t>(phase_)])();
-
-	// 発射タイマーカウントダウン
 	fireTimer_--;
-
-	// 指定時間に達した
-	if (fireTimer_ <= 0) {
-		
-		TimeReset();
-		
-		SetFireTimer();
-	}
-
 
 	timeCalls_.remove_if([](TimeCall* timeCall) {
 		if (timeCall->IsFinished() == true) {
@@ -81,6 +51,15 @@ void Enemy::Update(){
 	for (TimeCall* timeCall : timeCalls_)
 	{
 		timeCall->Update();
+	}
+
+
+	// 指定時間に達した
+	if (fireTimer_ <= 0) {
+
+		TimeReset();
+
+		SetFireTimer();
 	}
 
 	
@@ -96,50 +75,6 @@ void Enemy::Update(){
 
 	
 }
-
-/* void (Enemy::*Enemy::p[])() = {
-    &Enemy::ApproachUpdate, // 要素番号0
-    &Enemy::LeaveUpdate     // 要素番号1
-};
-
- void Enemy::ApproachInitialize() {
-	//発射タイマーを初期化
-	fireTimer_ = kFireInterval;
-
-	 phase_ = Enemy::Phase::Approach;
-}
-
- void Enemy::ApproachUpdate() {
-	//発射タイマーカウントダウン
-	fireTimer_--;
-
-	// 指定時間に達した
-	if (fireTimer_ <= 0)
-	{
-		isFire = true;
-
-		//弾を発射
-		Fire();
-
-		fireTimer_ = kFireInterval;
-	}
-	
-	// 移動(ベクトルを加算)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
-
-	// 規定の位置に到達したら離脱
-	 if (worldTransform_.translation_.z < 5.0f) {
-		//phase_ = Enemy::Phase::Leave;
-		
-	    phase_ = Enemy::Phase::Leave;
-	}
-
-}
-
- void Enemy::LeaveUpdate() {
-	// 移動(ベクトルを加算)
-	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
-}*/
 
 void Enemy::Fire() {
 	// 弾の速度
@@ -198,4 +133,9 @@ void Enemy::TimeReset() {
 	TimeCall* timedCall = new TimeCall(callback, kFireInterval);
 
 	timeCalls_.push_back(timedCall);
+
+}
+
+void Enemy::ClearTimeCalls(std::list<TimeCall*> timeCalls) { 
+	timeCalls.clear();
 }

@@ -72,6 +72,9 @@ public:
 	//コールバック関数
 	void TimeReset();
 
+	std::list<TimeCall*> GetTimeCalls() { return timeCalls_; }
+
+	void ClearTimeCalls(std::list<TimeCall*> timeCalls);
 
 private:
 

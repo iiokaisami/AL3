@@ -8,14 +8,10 @@ EnemyStateApproach::EnemyStateApproach(Enemy* enemy) : BaseEnemyState("State App
 }
 
 void EnemyStateApproach::Update() {
-	/*for (TimeCall* timeCall : timeCalls_) {
-		delete timeCall;
-	}*/
 
 	if (enemy_->GetWorldPosition().z < -6.0f) {
 
-		
-
+		enemy_->ClearTimeCalls(enemy_->GetTimeCalls());
 	    enemy_->ChangeState(std::make_unique<EnemyStateLeave>(enemy_));
 	
 	}

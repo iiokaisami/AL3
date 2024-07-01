@@ -8,4 +8,4 @@ EnemyStateLeave::EnemyStateLeave(Enemy* enemy) : BaseEnemyState("State Leave", e
 
 }
 
-void EnemyStateLeave::Update() { }
+void EnemyStateLeave::Update() {}

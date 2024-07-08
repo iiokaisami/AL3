@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "TextureManager.h"
+#include "Player.h"
 
 class EnemyBullet {
 public:
@@ -24,6 +25,8 @@ public:
 
 	// 半径
 	float GetRadius() { return radius_; }
+
+	void SetPlayer(Player* player) { player_ = player; }
 
 
 private:
@@ -53,4 +56,6 @@ private:
 
 	// 半径
 	float radius_ = 0;
+
+	Player* player_ = nullptr;
 };

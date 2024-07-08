@@ -339,3 +339,18 @@ float CalculationMath::Length(const Vector3& v1, const Vector3& v2) {
 
 	return d;
 }
+
+float CalculationMath::Lerp(const float& v1, const float& v2, float t) {
+
+	float result;
+	result = v1 + t * (v2 - v1);
+	return result;
+}
+
+Vector3 CalculationMath::Lerp(const Vector3& v1, const Vector3& v2, float t){
+
+	Vector3 result;
+	result = Add(v1, Multiply(t, Subtract(v2, v1)));
+	return result;
+}
+

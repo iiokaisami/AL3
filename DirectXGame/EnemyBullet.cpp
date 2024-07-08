@@ -27,6 +27,22 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	worldTransform_.scale_.y = 0.5f;
 	worldTransform_.scale_.z = 3.0f;
 
+	radius_ = 2.0f;
+}
+
+void EnemyBullet::Update() {
+
+	// 敵弾から自キャラへのベクトルを計算
+	Vector3 toPlayer = calculationMath_->Subtract(player_->GetWorldPosition(), GetWorldPosition());
+
+	// ベクトルを正規化する
+	toPlayer = calculationMath_->Normalize(toPlayer);
+	velocity_ = calculationMath_->Normalize(velocity_);
+	// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+	velocity_ = calculationMath_->Multiply(1.0f, calculationMath_->Slerp(velocity_, toPlayer, 0.1f));
+
+
+	// 進行方向に見た目の回転を合わせる(ex1)
 	// Y軸周り角度(θy)
 	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
 	double velocityXZ = sqrt(pow(velocity_.x, 2) + pow(velocity_.z, 2));
@@ -34,10 +50,7 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	// X軸周り角度(θx)
 	worldTransform_.rotation_.x = (float)std::atan2(-velocity_.y, velocityXZ);
 
-	radius_ = 2.0f;
-}
 
-void EnemyBullet::Update() {
 
 	// 座標を移動させる(フレーム分の移動量を足しこむ)
 	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, velocity_);

@@ -137,6 +137,7 @@ void GameScene::Update() {
 				// 弾を生成し、初期化
 				EnemyBullet* newBullet = new EnemyBullet();
 				newBullet->Initialize(model_, enemy->GetWorldPosition(), enemy->GetVelocity());
+				newBullet->SetPlayer(player_);
 
 				// 弾を登録する
 				AddEnemyBullet(newBullet);

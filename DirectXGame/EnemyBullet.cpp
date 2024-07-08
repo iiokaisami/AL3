@@ -1,5 +1,7 @@
 #include "EnemyBullet.h"
 #include "cassert"
+#include <cmath>
+#include <iostream>
 
 EnemyBullet::~EnemyBullet() { delete calculationMath_; }
 
@@ -20,6 +22,17 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 
 	// 引数で受け取った初期座標をリセット
 	worldTransform_.translation_ = position;
+
+	worldTransform_.scale_.x = 0.5f;
+	worldTransform_.scale_.y = 0.5f;
+	worldTransform_.scale_.z = 3.0f;
+
+	// Y軸周り角度(θy)
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+	double velocityXZ = sqrt(pow(velocity_.x, 2) + pow(velocity_.z, 2));
+
+	// X軸周り角度(θx)
+	worldTransform_.rotation_.x = (float)std::atan2(-velocity_.y, velocityXZ);
 
 	radius_ = 2.0f;
 }

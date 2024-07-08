@@ -3,7 +3,7 @@
 #include "EnemyStateLeave.h"
 
 EnemyStateApproach::EnemyStateApproach(Enemy* enemy) : BaseEnemyState("State Approach", enemy) { 
-	enemy_->SetVel({0, 0, -0.05f});
+	//enemy_->SetVel({0, 0, -0.05f});
 	enemy->SetFireTimer();
 }
 

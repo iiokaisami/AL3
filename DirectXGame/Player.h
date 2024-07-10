@@ -7,8 +7,10 @@
 #include "WorldTransform.h"
 #include <list>
 #include "Sprite.h"
+#include "Collider.h"
 
-class Player {
+class Player :public Collider
+{
 public:
 	~Player();
 
@@ -21,10 +23,10 @@ public:
 	void Attack();
 
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	//衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	//弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }

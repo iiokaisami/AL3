@@ -7,6 +7,7 @@
 #include "BaseEnemyState.h"
 #include "TimeCall.h"
 #include <list>
+#include "Collider.h"
 
 
 class Player;
@@ -14,7 +15,8 @@ class Player;
 //GameSceneの前方宣言
 class GameScene;
 
-class Enemy {
+class Enemy : public Collider 
+{
 public:
 
 	~Enemy();
@@ -42,10 +44,10 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	// 半径
 	float GetRadius() { return radius_; }

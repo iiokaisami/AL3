@@ -1,8 +1,10 @@
 #pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+#include "Collider.h"
 
-class PlayerBullet {
+class PlayerBullet : public Collider 
+{
 public:
 
 	~PlayerBullet();
@@ -16,10 +18,10 @@ public:
 	bool IsDead() const { return isDead_; }
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	// 半径
 	float GetRadius() { return radius_; }

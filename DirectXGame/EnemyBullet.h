@@ -3,8 +3,10 @@
 #include "WorldTransform.h"
 #include "TextureManager.h"
 #include "Player.h"
+#include "Collider.h"
 
-class EnemyBullet {
+class EnemyBullet : public Collider 
+{
 public:
 
 	~EnemyBullet();
@@ -18,10 +20,10 @@ public:
 	bool IsDead() const { return isDead_; }
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	// 半径
 	float GetRadius() { return radius_; }

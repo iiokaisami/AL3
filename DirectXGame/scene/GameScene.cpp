@@ -223,8 +223,6 @@ void GameScene::Draw() {
 }
 
 void GameScene::CheckAllCollisions() {
-	// 判定AとBの座標
-	Vector3 posA, posB;
 
 	//自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
@@ -236,31 +234,11 @@ void GameScene::CheckAllCollisions() {
 
 	#pragma region 自キャラと敵弾の当たり判定
 
-	//自キャラの座標
-	posA = player_->GetWorldPosition();
-
 	//自キャラと敵弾全ての当たり判定
 	for (EnemyBullet* bullet : enemyBullets) {
-		// 敵弾の座標
-		posB = bullet->GetWorldPosition();
 
-		float dir, rad, playerRad, enemyBltRad;
-		dir = sqrtf((posB.x - posA.x) * (posB.x - posA.x) + 
-			(posB.y - posA.y) * (posB.y - posA.y) +
-			(posB.z - posA.z) * (posB.z - posA.z));
+		CheckCollisionPair(player_, bullet);
 
-		playerRad = player_->GetRadius();
-		enemyBltRad = bullet->GetRadius();
-
-		rad = sqrtf((playerRad + enemyBltRad) * (playerRad + enemyBltRad));
-
-		// 球と球の交差判定
-		if (dir <= rad) {
-			// 自キャラの衝突時コールバックを呼び出す
-			player_->OnCollision();
-			// 敵弾の衝突時コールバックを呼び出す
-			bullet->OnCollision();
-		}
 	}
 
 	#pragma endregion
@@ -269,29 +247,11 @@ void GameScene::CheckAllCollisions() {
 
 	for (Enemy* enemy : enemys) {
 
-		// 敵キャラの座標
-		posA = enemy->GetWorldPosition();
-
 		// 自弾と敵キャラ全ての当たり判定
 		for (PlayerBullet* bullet : playerBullets) {
-			// 自弾の座標
-			posB = bullet->GetWorldPosition();
 
-			float dir, rad, enemyRad, playerBltRad;
-			dir = sqrtf((posB.x - posA.x) * (posB.x - posA.x) + (posB.y - posA.y) * (posB.y - posA.y) + (posB.z - posA.z) * (posB.z - posA.z));
-
-			enemyRad = enemy->GetRadius();
-			playerBltRad = bullet->GetRadius();
-
-			rad = sqrtf((enemyRad + playerBltRad) * (enemyRad + playerBltRad));
-
-			// 球と球の交差判定
-			if (dir <= rad) {
-				// 敵キャラの衝突時コールバックを呼び出す
-				enemy->OnCollision();
-				// 自弾の衝突時コールバックを呼び出す
-				bullet->OnCollision();
-			}
+			CheckCollisionPair(enemy, bullet);
+	
 		}
 	}
     #pragma endregion
@@ -299,31 +259,12 @@ void GameScene::CheckAllCollisions() {
 	#pragma region 自弾と敵弾の当たり判定
 
 	for (EnemyBullet* enemyBullet : enemyBullets) {
-		// 敵弾の座標
-		posA = enemyBullet->GetWorldPosition();
-
+		
 		// 自弾と敵弾全ての当たり判定
 		for (PlayerBullet* playerBullet : playerBullets) {
-			// 自弾の座標
-			posB = playerBullet->GetWorldPosition();
 
-			float dir, rad, enemyBltRad, playerBltRad;
-			dir = sqrtf((posB.x - posA.x) * (posB.x - posA.x) + 
-				(posB.y - posA.y) * (posB.y - posA.y) + 
-				(posB.z - posA.z) * (posB.z - posA.z));
-
-			enemyBltRad = enemyBullet->GetRadius();
-			playerBltRad = playerBullet->GetRadius();
-
-			rad = sqrtf((enemyBltRad + playerBltRad) * (enemyBltRad + playerBltRad));
-
-			// 球と球の交差判定
-			if (dir <= rad) {
-				// 敵弾の衝突時コールバックを呼び出す
-				enemyBullet->OnCollision();
-				// 自弾の衝突時コールバックを呼び出す
-				playerBullet->OnCollision();
-			}
+			CheckCollisionPair(enemyBullet, playerBullet);
+		
 		}
 	}
 
@@ -429,5 +370,31 @@ void GameScene::UpdateEnemyPopCommands() {
 			//コマンドループを抜ける
 			break;
 		}
+	}
+}
+
+void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) 
+{
+	Vector3 posA, posB;
+
+	posA = colliderA->GetWorldPosition();
+	posB = colliderB->GetWorldPosition();
+
+	float dir, rad, radA, radB;
+	dir = sqrtf((posB.x - posA.x) * (posB.x - posA.x) + 
+		(posB.y - posA.y) * (posB.y - posA.y) + 
+		(posB.z - posA.z) * (posB.z - posA.z));
+
+	radA = colliderA->GetRadius();
+	radB = colliderB->GetRadius();
+
+	rad = sqrtf((radA + radB) * (radA + radB));
+
+	// 球と球の交差判定
+	if (dir <= rad) {
+		// コライダーAの衝突時コールバックを呼び出す
+		colliderA->OnCollision();
+		// コライダーBの衝突時コールバックを呼び出す
+		colliderB->OnCollision();
 	}
 }

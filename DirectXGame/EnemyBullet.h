@@ -1,14 +1,12 @@
 #pragma once
-#include "Model.h"
-#include "WorldTransform.h"
-#include "TextureManager.h"
-#include "Player.h"
 #include "Collider.h"
+#include "Model.h"
+#include "Player.h"
+#include "TextureManager.h"
+#include "WorldTransform.h"
 
-class EnemyBullet : public Collider 
-{
+class EnemyBullet : public Collider {
 public:
-
 	~EnemyBullet();
 
 	void Initialize(Model* model, const Vector3& position, const Vector3 velocity);
@@ -26,13 +24,11 @@ public:
 	Vector3 GetWorldPosition() override;
 
 	// 半径
-	float GetRadius() const { return radius_; }
+	float GetRadius() { return radius_; }
 
 	void SetPlayer(Player* player) { player_ = player; }
 
-
 private:
-
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 

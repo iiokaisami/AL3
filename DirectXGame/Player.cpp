@@ -43,6 +43,10 @@ void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
 
 	viewProjection_.Initialize();
 
+	SetCollisionAttribute(0b1);
+
+	SetCollisionMask(0b1 << 1);
+
 };
 
 void Player::Update(ViewProjection& viewProjection) {

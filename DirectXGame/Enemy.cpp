@@ -34,6 +34,10 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 	isDeath_ = false;
 
 	ChangeState(std::make_unique<EnemyStateApproach>(this));
+
+	SetCollisionAttribute(0b1 << 1);
+
+	SetCollisionMask(0b1);
 }
 
 void Enemy::Update(){

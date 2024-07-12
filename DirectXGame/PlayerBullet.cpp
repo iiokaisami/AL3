@@ -25,6 +25,10 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	worldTransform_.translation_ = position;
 
 	radius_ = 2.0f;
+
+	SetCollisionAttribute(0b1);
+
+	SetCollisionMask(0b1 << 1);
 }
 
 void PlayerBullet::Update() {

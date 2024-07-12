@@ -28,6 +28,10 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	worldTransform_.scale_.z = 3.0f;
 
 	radius_ = 2.0f;
+
+	SetCollisionAttribute(0b1 << 1);
+
+	SetCollisionMask(0b1);
 }
 
 void EnemyBullet::Update() {

@@ -354,7 +354,7 @@ Vector3 CalculationMath::Lerp(const Vector3& v1, const Vector3& v2, float t){
 	return result;
 }
 
-inline Vector3 CalculationMath::Slerp(const Vector3& v1, const Vector3& v2, float t) {
+Vector3 CalculationMath::Slerp(const Vector3& v1, const Vector3& v2, float t) {
 
 	Vector3 Nv1 = Normalize(v1);
 	Vector3 Nv2 = Normalize(v2);

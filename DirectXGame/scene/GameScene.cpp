@@ -232,50 +232,14 @@ void GameScene::CheckAllCollisions() {
 
 	const std::list<Enemy*>& enemys = GetEnemy();
 
-
-	// コライダー
-	std::list<Collider*> colliders_;
-
-	// コライダーをリストに登録
-	colliders_.push_back(player_);
-	// 敵全てについて
-	for (Enemy* enemy : enemys) {
-		colliders_.push_back(enemy);
-	}
-	// 自弾全てについて
-	for (PlayerBullet* playerBullet : playerBullets) {
-		colliders_.push_back(playerBullet);
-	}
-	// 敵弾全てについて
-	for (EnemyBullet* bullet : enemyBullets) {
-		colliders_.push_back(bullet);
-	}
-
-
-	// リスト内のペアを総当たり
-	std::list<Collider*>::iterator itrA = colliders_.begin();
-	for (; itrA != colliders_.end(); ++itrA) {
-		Collider* colliderA = *itrA;
-
-		// イテレータBはイテレータAの次の要素から回す（重複判定を回避）
-		std::list<Collider*>::iterator itrB = itrA;
-		itrB++;
-
-		for (; itrB != colliders_.end(); ++itrB) {
-			Collider* colliderB = *itrB;
-
-			// ペアの当たり判定
-			CheckCollisionPair(colliderA, colliderB);
-		}
-	}
-
+	
 
 	#pragma region 自キャラと敵弾の当たり判定
 
 	//自キャラと敵弾全ての当たり判定
-	for (EnemyBullet* bullet : enemyBullets) {
+	for (EnemyBullet* enemyBullet : enemyBullets) {
 
-		CheckCollisionPair(player_, bullet);
+		CheckCollisionPair(player_, enemyBullet);
 
 	}
 
@@ -307,6 +271,7 @@ void GameScene::CheckAllCollisions() {
 	}
 
     #pragma endregion
+	
 }
 
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {

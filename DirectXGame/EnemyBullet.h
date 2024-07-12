@@ -26,7 +26,7 @@ public:
 	Vector3 GetWorldPosition() override;
 
 	// 半径
-	float GetRadius() { return radius_; }
+	float GetRadius() const { return radius_; }
 
 	void SetPlayer(Player* player) { player_ = player; }
 

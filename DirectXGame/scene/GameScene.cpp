@@ -14,6 +14,7 @@ GameScene::~GameScene() {
 	delete skydome_;
 	delete modelSkydome_;
 	delete railCamera_;
+	delete colliderManager_;
 
 	for (Enemy* enemy : enemys_) {
 		delete enemy;
@@ -70,6 +71,9 @@ void GameScene::Initialize() {
 
 	 //レティクルのテクスチャ
 	 TextureManager::Load("reticle.png");
+
+	 colliderManager_ = new CollisionManager();
+	 colliderManager_->Initialize();
 }
 
 void GameScene::Update() { 
@@ -152,10 +156,15 @@ void GameScene::Update() {
 		bullet->Update();
 	}
 
-	CheckAllCollisions();
+
+
+	// 自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+
+	// コライダーをリストに登録
+	colliderManager_->UpData(player_, playerBullets, GetBullets(), GetEnemy());
 
 	skydome_->Update();
-
 }
 
 void GameScene::Draw() {
@@ -222,53 +231,7 @@ void GameScene::Draw() {
 #pragma endregion
 }
 
-void GameScene::CheckAllCollisions() {
 
-	//自弾リストの取得
-	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-
-	//敵弾リストの取得
-	const std::list<EnemyBullet*>& enemyBullets = GetBullets();
-
-	const std::list<Enemy*>& enemys = GetEnemy();
-
-	
-    // コライダー
-    std::list<Collider*> colliders_;
-
-    // コライダーをリストに登録
-    colliders_.push_back(player_);
-    // 敵全てについて
-    for (Enemy* enemy : enemys) {
-	    colliders_.push_back(enemy);
-    }
-    // 自弾全てについて
-    for (PlayerBullet* playerBullet : playerBullets) {
-    	colliders_.push_back(playerBullet);
-    }
-    // 敵弾全てについて
-    for (EnemyBullet* enemyBullet : enemyBullets) {
-	    colliders_.push_back(enemyBullet);
-    }
-
-
-    // リスト内のペアを総当たり
-    std::list<Collider*>::iterator itrA = colliders_.begin();
-	for (; itrA != colliders_.end(); ++itrA) {
-		Collider* colliderA = *itrA;
-
-		// イテレータBはイテレータAの次の要素から回す（重複判定を回避）
-		std::list<Collider*>::iterator itrB = itrA;
-		itrB++;
-
-		for (; itrB != colliders_.end(); ++itrB) {
-			Collider* colliderB = *itrB;
-
-			// ペアの当たり判定
-			CheckCollisionPair(colliderA, colliderB);
-		}
-	}
-}
 
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	// リストに登録
@@ -369,36 +332,5 @@ void GameScene::UpdateEnemyPopCommands() {
 			//コマンドループを抜ける
 			break;
 		}
-	}
-}
-
-void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) 
-{
-	Vector3 posA, posB;
-
-	posA = colliderA->GetWorldPosition();
-	posB = colliderB->GetWorldPosition();
-
-	float dir, rad, radA, radB;
-	dir = sqrtf((posB.x - posA.x) * (posB.x - posA.x) + 
-		(posB.y - posA.y) * (posB.y - posA.y) + 
-		(posB.z - posA.z) * (posB.z - posA.z));
-
-	radA = colliderA->GetRadius();
-	radB = colliderB->GetRadius();
-
-	rad = sqrtf((radA + radB) * (radA + radB));
-
-	if (colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask() or
-		colliderA->GetCollisionMask() != colliderB->GetCollisionAttribute()){
-		return;
-	}
-
-	// 球と球の交差判定
-	if (dir <= rad) {
-		// コライダーAの衝突時コールバックを呼び出す
-		colliderA->OnCollision();
-		// コライダーBの衝突時コールバックを呼び出す
-		colliderB->OnCollision();
 	}
 }

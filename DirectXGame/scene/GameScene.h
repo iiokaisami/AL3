@@ -12,6 +12,7 @@
 #include "Enemy.h"
 #include "Skydome.h"
 #include "RailCamera.h"
+#include "CollisionManager.h"
 #include <sstream>
 
 
@@ -46,11 +47,6 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
-	/// <summary>
-	/// 衝突判定と応答
-	/// </summary>
-	void CheckAllCollisions();
-
 	void AddEnemyBullet(EnemyBullet* enemyBullet);
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() const { return enemyBullets_; }
@@ -71,6 +67,7 @@ public: // メンバ関数
     /// 敵発生のコマンド更新
     /// </summary>
 	void UpdateEnemyPopCommands();
+
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -110,11 +107,6 @@ private: // メンバ変数
 	//待機タイマー
 	int32_t waitingTimer = 0;
 
-	/// <summary>
-	/// コライダーを2つの衝突判定と応答
-	/// </summary>
-	/// <param name="collierA">コライダーA</param>
-	/// <param name="colliderB">コライダーB</param>
-	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
+	CollisionManager* colliderManager_ = nullptr;
 
 };

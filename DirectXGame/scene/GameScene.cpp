@@ -15,6 +15,7 @@ GameScene::~GameScene() {
 	delete modelSkydome_;
 	delete railCamera_;
 	delete colliderManager_;
+	delete calculationMath_; 
 
 	for (Enemy* enemy : enemys_) {
 		delete enemy;
@@ -64,7 +65,7 @@ void GameScene::Initialize() {
 	 skydome_->Initialize(modelSkydome_);
 
 	 railCamera_ = new RailCamera;
-	 railCamera_->Initialize({0, 0, -30}, {0, 0, 0});
+	 railCamera_->Initialize({0, 0, -30}, {0, 0, 0},viewProjection_);
 
 	 //自キャラとレールカメラの親子関係を結ぶ
 	 player_->SetParent(&railCamera_->GetWorldTransform());
@@ -74,6 +75,9 @@ void GameScene::Initialize() {
 
 	 colliderManager_ = new CollisionManager();
 	 colliderManager_->Initialize();
+
+	  
+	 calculationMath_ = new CalculationMath;
 }
 
 void GameScene::Update() { 
@@ -104,6 +108,8 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 
+	
+	
 
 	//自キャラの更新
 	player_->Update(viewProjection_);
@@ -157,7 +163,7 @@ void GameScene::Update() {
 	}
 
 
-
+	
 	// 自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 
@@ -211,6 +217,8 @@ void GameScene::Draw() {
 		bullet->Draw(viewProjection_);
 	}
 
+	
+
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -220,6 +228,8 @@ void GameScene::Draw() {
 	Sprite::PreDraw(commandList);
 
 	player_->DrawUI();
+	
+	railCamera_->Draw();
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる

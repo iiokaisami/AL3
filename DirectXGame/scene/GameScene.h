@@ -109,4 +109,8 @@ private: // メンバ変数
 
 	CollisionManager* colliderManager_ = nullptr;
 
+
+	
+
+	CalculationMath* calculationMath_ = nullptr;
 };

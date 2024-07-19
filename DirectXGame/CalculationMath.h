@@ -1,12 +1,22 @@
 #pragma once
 #include <cmath>
+#include <cassert>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 #include "Matrix4x4.h"
 #include "assert.h"
 #include "Vector3.h"
+#include "Operator.h"
 
 class CalculationMath {
 
+	Vector3 operator-(const Vector3& v) { return {-v.x, -v.y, -v.z}; }
+	Vector3 operator+(const Vector3& v) { return v; }
+
+
 public:
+
 	void Initialize();
 
 	void Updade();
@@ -89,4 +99,8 @@ public:
 	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 
 	Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t);
+
+	Vector3 CatmullRomInterpolation(const Vector3& p0,const Vector3& p1,const Vector3& p2,const Vector3& p3, float t);
+
+	Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t);
 };

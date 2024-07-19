@@ -6,10 +6,9 @@
 
 class RailCamera {
 public:
-
 	~RailCamera();
 
-	void Initialize(Vector3 worldMatrix, Vector3 rotation,ViewProjection& viewProjection);
+	void Initialize(Vector3 worldMatrix, Vector3 rotation, ViewProjection& viewProjection);
 
 	void Update();
 
@@ -19,17 +18,17 @@ public:
 
 	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
-private:
+	Vector3 GetWorldPosition(); 
 
-	//ワールド変換データ
+private:
+	// ワールド変換データ
 	WorldTransform worldTransform_;
 
-	//ビュープロジェクション
+	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
-	//数学関数
+	// 数学関数
 	CalculationMath* calculationMath_ = nullptr;
-
 
 	// スプライン曲線制御点（通過点）
 	std::vector<Vector3> controlPoints_;
@@ -37,4 +36,8 @@ private:
 	std::vector<Vector3> pointsDrawing;
 	// 線分の数
 	const size_t segmentCount = 100;
+
+	Vector3 target;
+	Vector3 eye;
+	Vector3 forward;
 };

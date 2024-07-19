@@ -46,17 +46,36 @@ void RailCamera::Update() {
 		Vector3 pos = calculationMath_->CatmullRomPosition(controlPoints_, t);
 		// 描画用頂点リストに追加
 		pointsDrawing.push_back(pos);
+
+		target = calculationMath_->CatmullRomPosition(controlPoints_, t + 1);
 	}
 
 	Vector3 railCameraSpeed = {0, 0, 0.05f};
 	Vector3 rotation = {0, 0.000f, 0};
 
+	// ワールドトランスフォームの角度の数値を加算したりする(回転)
+	// worldTransform_.rotation_ = calculationMath_->Add(worldTransform_.rotation_, rotation);
+
+	eye = GetWorldPosition();
+	forward = target - eye;
+
+	// ベクトルを正規化する
+	forward = calculationMath_->Normalize(forward);
+	railCameraSpeed = calculationMath_->Normalize(railCameraSpeed);
+	// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+	railCameraSpeed = calculationMath_->Slerp(railCameraSpeed, forward, 0.1f) * 0.05f;
+
+	// Y軸周り角度(θy)
+	worldTransform_.rotation_.y = std::atan2(forward.x, forward.z);
+	double velocityXZ = sqrt(pow(forward.x, 2) + pow(forward.z, 2));
+
+	// X軸周り角度(θx)
+	worldTransform_.rotation_.x = (float)std::atan2(-forward.y, velocityXZ);
+
 	//ワールドトランスフォームの座標の数値を加算したりする(移動)
 	//worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, railCameraSpeed);
 	//worldTransform_.translation_ = calculationMath_->Subtract(worldTransform_.translation_, railCameraSpeed);
-
-	//ワールドトランスフォームの角度の数値を加算したりする(回転)
-	//worldTransform_.rotation_ = calculationMath_->Add(worldTransform_.rotation_, rotation);
+	worldTransform_.translation_ = eye + railCameraSpeed;
 
 	//ワールドトランスフォームのワールド行列再計算
 	worldTransform_.UpdateMatrix();
@@ -68,4 +87,16 @@ void RailCamera::Draw() {
 	for (size_t i = 0; i < segmentCount; i++) {
 		PrimitiveDrawer::GetInstance()->DrawLine3d(pointsDrawing[i], pointsDrawing[i + 1], {1.0f, 0.0f, 0.0f, 1.0f});
 	}
+}
+
+Vector3 RailCamera::GetWorldPosition() {
+	// ワールド座標を入れる変数
+	Vector3 worldPos;
+
+	// ワールド座標の平行移動成分を取得(ワールド座標)
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
 }

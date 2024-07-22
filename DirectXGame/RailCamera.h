@@ -18,8 +18,6 @@ public:
 
 	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
-	Vector3 GetWorldPosition(); 
-
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -37,7 +35,11 @@ private:
 	// 線分の数
 	const size_t segmentCount = 100;
 
-	Vector3 target;
-	Vector3 eye;
-	Vector3 forward;
+	Vector3 target = {0, 0, 0};
+	Vector3 eye = {0, 0, 0};
+	Vector3 forward = {0, 0, 0};
+
+	const float segmentCountT = 1.0f / 600.0f;
+	float targetT = 30.0f / 600.0f;
+	float eyeT = 0;
 };

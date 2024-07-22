@@ -65,7 +65,7 @@ void GameScene::Initialize() {
 	 skydome_->Initialize(modelSkydome_);
 
 	 railCamera_ = new RailCamera;
-	 railCamera_->Initialize({0, 0, -30}, {0, 0, 0},viewProjection_);
+	 railCamera_->Initialize({0, 0, 0}, {0, 0, 0},viewProjection_);
 
 	 //自キャラとレールカメラの親子関係を結ぶ
 	 player_->SetParent(&railCamera_->GetWorldTransform());

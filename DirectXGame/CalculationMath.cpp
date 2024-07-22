@@ -340,6 +340,8 @@ float CalculationMath::Length(const Vector3& v1, const Vector3& v2) {
 	return d;
 }
 
+
+
 float CalculationMath::Lerp(const float& v1, const float& v2, float t) {
 
 	float result;

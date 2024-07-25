@@ -9,6 +9,8 @@
 #include "Sprite.h"
 #include "Collider.h"
 
+class Enemy;
+
 class Player :public Collider
 {
 public:
@@ -44,6 +46,12 @@ public:
 	// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
 	void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
+	void SetEnemy(std::list<Enemy*> enemy) { enemys_ = enemy; }
+
+	void PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
+
+	bool IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection);
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransformBlock;
@@ -57,6 +65,13 @@ private:
 	Input* input_ = nullptr;
 
 	CalculationMath* calculationMath_ = nullptr;
+
+	// 弾の速度
+	const float kBulletSpeed = 1.0f;
+
+	Vector3 velocity{0, 0, kBulletSpeed};
+
+	Vector3 rockOnVelocity{0, 0, kBulletSpeed};
 
 	// 弾
 	std::list<PlayerBullet*> bullets_;
@@ -72,4 +87,7 @@ private:
 
 	ViewProjection viewProjection_;
 
+	std::list<Enemy*> enemys_;
+
+	bool isRockon = false;
 };

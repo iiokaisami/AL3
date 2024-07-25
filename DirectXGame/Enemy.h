@@ -25,15 +25,6 @@ public:
 
 	void Update();
 
-	//接近フェーズ初期化
-	//void ApproachInitialize();
-
-	// 接近フェーズ更新関数
-	//void ApproachUpdate();
-
-	// 離脱フェーズ更新関数
-	//void LeaveUpdate();
-
 	//弾発射
 	void Fire();
 
@@ -78,6 +69,8 @@ public:
 
 	void ClearTimeCalls(std::list<TimeCall*> timeCalls);
 
+	Vector3 ChangeScreenPos(ViewProjection& viewProjection_);
+
 private:
 
 	// ワールド変換データ
@@ -91,18 +84,6 @@ private:
 
 	
 	CalculationMath* calculationMath_ = nullptr;
-
-
-	//行動フェーズ
-	/* enum class Phase {
-		Approach, // 接近する
-		Leave,    // 離脱する
-	};
-
-	//フェーズ
-	Phase phase_ = Enemy::Phase::Approach;
-
-	static void (Enemy::*p[])();*/
 
 	std::unique_ptr<BaseEnemyState> state_;
 

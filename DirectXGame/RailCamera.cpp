@@ -45,6 +45,8 @@ void RailCamera::Update() {
 
 //#endif // DEBUG
 
+	Vector3 railCameraSpeed = {0, 0, 0.01f};
+
 	// 線分の数+1個分の頂点座標を計算
 	for (size_t i = 0; i < segmentCount + 1; i++) {
 		float t = 1.0f / segmentCount * i;
@@ -62,7 +64,7 @@ void RailCamera::Update() {
 	target = calculationMath_->CatmullRomPosition(controlPoints_, targetT);
 	target.y += 1;
 
-	if (targetT < 1.0f) {
+	/*if (targetT < 1.0f) {
 
 		worldTransform_.translation_ = eye;
 
@@ -76,7 +78,9 @@ void RailCamera::Update() {
 
 		cameraRotate.x = std::atan2(-forward.y, length);
 		worldTransform_.rotation_ = cameraRotate;
-	}
+	}*/
+
+	//worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, railCameraSpeed);
 
 	//ワールドトランスフォームのワールド行列再計算
 	worldTransform_.UpdateMatrix();
@@ -86,7 +90,7 @@ void RailCamera::Update() {
 }
 
 void RailCamera::Draw() {
-	for (size_t i = 0; i < segmentCount; i++) {
+	/*for (size_t i = 0; i < segmentCount; i++) {
 		PrimitiveDrawer::GetInstance()->DrawLine3d(pointsDrawing[i], pointsDrawing[i + 1], {1.0f, 0.0f, 0.0f, 1.0f});
-	}
+	}*/
 }

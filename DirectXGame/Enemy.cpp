@@ -4,7 +4,7 @@
 #include "Player.h"
 #include "EnemyStateApproach.h"
 #include "EnemyStateLeave.h"
-
+#include "WinApp.h"
 
 Enemy::~Enemy() { 
 	delete calculationMath_;
@@ -40,7 +40,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 	SetCollisionMask(0b1);
 }
 
-void Enemy::Update(){
+void Enemy::Update() {
 	
 	fireTimer_--;
 
@@ -73,11 +73,7 @@ void Enemy::Update(){
 	// 移動(ベクトルを加算)
 	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
 
-
-
 	worldTransform_.UpdateMatrix();
-
-	
 }
 
 void Enemy::Fire() {
@@ -141,5 +137,22 @@ void Enemy::TimeReset() {
 }
 
 void Enemy::ClearTimeCalls(std::list<TimeCall*> timeCalls) { 
-	timeCalls.clear();
+	timeCalls.clear(); 
+}
+
+Vector3 Enemy::ChangeScreenPos(ViewProjection& viewProjection_) { 
+	// ワールド->スクリーン
+	Vector3 position = GetWorldPosition();
+
+	// ビューポート行列
+	Matrix4x4 matViewport = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix4x4 matVPV = viewProjection_.matView * viewProjection_.matProjection * matViewport;
+
+	// ワールド->スクリーン座標系（ここで3Dから2Dになる）
+	position = calculationMath_->Transform(position, matVPV);
+
+	// 座標設定
+	return position;
 }

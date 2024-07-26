@@ -90,4 +90,11 @@ private:
 	std::list<Enemy*> enemys_;
 
 	bool isRockon = false;
+
+	Vector3 enemyPos{0, 0, 0};
+
+	bool A = false;
+	bool B = false;
+	float t = 0;
+	Vector3 positionReticle = {0, 0, 0};
 };

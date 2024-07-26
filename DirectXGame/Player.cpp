@@ -135,7 +135,27 @@ void Player::Update(ViewProjection& viewProjection) {
 
 	PlayerReticle(matViewPort, viewProjection);
 
+	if (!isRockon && A) {
+		B = true;
+	}
+
+	if (B) {
+		Vector3 pos = calculationMath_->Lerp({positionReticle.x, positionReticle.y, 0}, positionReticle, t);
+		t += 1.0f / 50.0f;
+		sprite2DReticle_->SetPosition({pos.x, pos.y});
+
+		if (t > 1.0f) {
+			B = false;
+			t = 0;
+		}
+	} else {
+		sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+	}
+
+	A = isRockon;
+
 	IsRockon(enemys_, viewProjection);
+
 
 	/////// キャラクターの攻撃////////
 	Attack();
@@ -144,8 +164,6 @@ void Player::Update(ViewProjection& viewProjection) {
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
 	}
-
-
 };
 
 void Player::Attack() {
@@ -361,8 +379,6 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 
 	///////3Dレコードレティクルのワールド座標から2Dレティクルのスクリーン座標を計算//////
 
-	Vector3 positionReticle;
-
 	positionReticle.x = worldTransform3DReticle_.matWorld_.m[3][0];
 	positionReticle.y = worldTransform3DReticle_.matWorld_.m[3][1];
 	positionReticle.z = worldTransform3DReticle_.matWorld_.m[3][2];
@@ -377,25 +393,18 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
 
 	/////////////////////////////////////////////////////////////////////////////////////
-
-	if (isRockon) {
-		float t = 0;
-		Vector3 pos = calculationMath_->Lerp({sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y, 0}, positionReticle, t);
-		t += 0.1f;
-		sprite2DReticle_->SetPosition({pos.x, pos.y});
-	}
 }
 
 bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) { 
 	Vector2 reticlePos = sprite2DReticle_->GetPosition();
-	Vector3 enemyPos;
+
 	float length = 100.0f;
 	for (Enemy* enemy : enemys) {
 		enemyPos = enemy->ChangeScreenPos(viewProjection);
 
 		length = calculationMath_->Length({reticlePos.x, reticlePos.y, 0}, enemyPos);
 
-		if (length <= 30.0f) {
+		if (length <= 20.0f) {
 			sprite2DReticle_->SetPosition({enemyPos.x,enemyPos.y});
 
 			rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();

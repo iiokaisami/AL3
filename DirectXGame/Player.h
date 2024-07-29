@@ -44,13 +44,15 @@ public:
 	void DrawUI();
 
 	// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
-	void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
+	//void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 	void SetEnemy(std::list<Enemy*> enemy) { enemys_ = enemy; }
 
 	void PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 	bool IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection);
+
+	//void AddReticle(Sprite* sprite);
 
 private:
 	// ワールド変換データ
@@ -82,8 +84,18 @@ private:
 	// 3Dレティクル用ワールドトランスフォーム
 	WorldTransform worldTransform3DReticle_;
 
+	uint32_t textureReticle = 0;
+
 	//2Dレティクル用のスプライト
+	//std::list<Sprite*> sprite2DReticle_ = {0, 0, 0};
+
+	//std::list<Vector2*> spritePosition_;
+
+	//std::list<Vector3*> positionReticle_;
+
 	Sprite* sprite2DReticle_ = nullptr;
+	Vector2 spritePosition_;
+	Vector3 positionReticle_ = {0, 0, 0};
 
 	ViewProjection viewProjection_;
 
@@ -93,8 +105,10 @@ private:
 
 	Vector3 enemyPos{0, 0, 0};
 
-	bool A = false;
-	bool B = false;
+	float length = 100.0f;
+
+	bool preRockOn = false;
+	bool isLeave = false;
 	float t = 0;
-	Vector3 positionReticle = {0, 0, 0};
+
 };

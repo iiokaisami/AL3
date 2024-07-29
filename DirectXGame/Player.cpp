@@ -12,7 +12,17 @@ Player::~Player() {
 		delete bullet;
 	}
 
-	delete sprite2DReticle_;
+	/*for (Sprite* sprite2DReticle : sprite2DReticle_) {
+		delete sprite2DReticle;
+	}
+
+	for (Vector2* spritePosition : spritePosition_) {
+		delete spritePosition;
+	}
+
+	for (Vector3* positionReticle : positionReticle_) {
+		delete positionReticle;
+	}*/
 }
 
 void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
@@ -37,10 +47,14 @@ void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
 	worldTransform3DReticle_.Initialize();
 
 	//レティクル用テクスチャ取得
-	uint32_t textureReticle = TextureManager::Load("reticle.png");
+	textureReticle = TextureManager::Load("reticle.png");
 
-	//スプライト生成
-	sprite2DReticle_ = Sprite::Create(textureReticle, {}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	// スプライト生成
+	//for (Sprite* sprite2DReticle : sprite2DReticle_) {
+		// sprite2DReticle = new Sprite;
+		//  AddReticle(sprite2DReticle);
+		sprite2DReticle_ = Sprite::Create(textureReticle, {}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	//}
 
 	viewProjection_.Initialize();
 
@@ -135,11 +149,11 @@ void Player::Update(ViewProjection& viewProjection) {
 
 	PlayerReticle(matViewPort, viewProjection);
 
-	if (!isRockon && A) {
-		B = true;
+	/*if (!isRockon && preRockOn) {
+		isLeave = true;
 	}
 
-	if (B) {
+	if (isLeave) {
 		Vector3 pos = calculationMath_->Lerp({positionReticle.x, positionReticle.y, 0}, positionReticle, t);
 		t += 1.0f / 50.0f;
 		sprite2DReticle_->SetPosition({pos.x, pos.y});
@@ -150,9 +164,18 @@ void Player::Update(ViewProjection& viewProjection) {
 		}
 	} else {
 		sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
-	}
+	}*/
 
-	A = isRockon;
+	preRockOn = isRockon;
+
+
+	//if (isRockon)
+	//{
+		//for (Sprite* sprite2DReticle : sprite2DReticle_) {
+			//sprite2DReticle = new Sprite;
+			//AddReticle(sprite2DReticle);
+		//}
+	//}
 
 	IsRockon(enemys_, viewProjection);
 
@@ -247,17 +270,18 @@ void Player::SetParent(const WorldTransform* parent) {
 }
 
 void Player::DrawUI() {
-	if (isRockon){
-		sprite2DReticle_->SetColor({1.0f, 0, 0, 1.0f});
-	}
-	else{
-		sprite2DReticle_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	}
-	sprite2DReticle_->Draw();
+	//for (Sprite* sprite2DReticle : sprite2DReticle_) {
+		if (isRockon) {
+			sprite2DReticle_->SetColor({1.0f, 0, 0, 1.0f});
+		} /*else {
+			sprite2DReticle->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+		}*/
+		sprite2DReticle_->Draw();
+	//}
 }
 
 // マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
-void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
+/* void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
 
 	// ビュープロジェクションビューポート合成行列
 	Matrix4x4 matVPV = calculationMath_->Multiply(viewProjection.matView, calculationMath_->Multiply(viewProjection.matProjection, matViewPort));
@@ -267,7 +291,12 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	
 	
 	 // スプライトの現在座標を取得
-	 Vector2 spritePosition = sprite2DReticle_->GetPosition();
+	for (Sprite* sprite2DReticle : sprite2DReticle_) {
+		for (Vector2* spritePosition : spritePosition_) {
+			spritePosition->x = sprite2DReticle->GetPosition().x;
+			spritePosition->y = sprite2DReticle->GetPosition().y;
+		}
+	}
 
 	 XINPUT_STATE joyState;
 
@@ -282,7 +311,9 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 		 ScreenToClient(hwnd, &mousePosition);
 
 		 // マウス座標を2Dレティクルのスプライトに代入する
-		 sprite2DReticle_->SetPosition(Vector2((float)mousePosition.x, (float)mousePosition.y));
+		 for (Sprite* sprite2DReticle : sprite2DReticle_) {
+			 sprite2DReticle->SetPosition(Vector2((float)mousePosition.x, (float)mousePosition.y));
+		 }
 
 		 // スクリーン座標
 		 Vector3 posNear = Vector3((float)mousePosition.x, (float)mousePosition.y, 0);
@@ -319,10 +350,14 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 	 // ジョイスティック状態取得
 	 if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		 spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 5.0f;
-		 spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 5.0f;
-		 // スプライトの座標変更を反映
-		 sprite2DReticle_->SetPosition(spritePosition);
+		 for (Sprite* sprite2DReticle : sprite2DReticle_) {
+			 for (Vector2* spritePosition : spritePosition_) {
+				 spritePosition->x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 5.0f;
+				 spritePosition->y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 5.0f;
+				 // スプライトの座標変更を反映
+				 sprite2DReticle->SetPosition({spritePosition->x,spritePosition->y});
+			 }
+		 }
 	 }
 
 	  // スクリーン座標
@@ -354,7 +389,7 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 	 ImGui::End();
 
-}
+}*/
 
 void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
 	////////////////自機のワールド座標から3Dレティクルのワールド座標を計算///////////////////
@@ -378,41 +413,93 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	///////3Dレコードレティクルのワールド座標から2Dレティクルのスクリーン座標を計算//////
+	/* for (Vector3* positionReticle : positionReticle_) {
+		positionReticle->x = worldTransform3DReticle_.matWorld_.m[3][0];
+		positionReticle->y = worldTransform3DReticle_.matWorld_.m[3][1];
+		positionReticle->z = worldTransform3DReticle_.matWorld_.m[3][2];
 
-	positionReticle.x = worldTransform3DReticle_.matWorld_.m[3][0];
-	positionReticle.y = worldTransform3DReticle_.matWorld_.m[3][1];
-	positionReticle.z = worldTransform3DReticle_.matWorld_.m[3][2];
+		// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+		Matrix4x4 matViewProjectionViewport = calculationMath_->Multiply(calculationMath_->Multiply(viewProjection.matView, viewProjection.matProjection), matViewPort);
+
+		// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
+		//positionReticle = calculationMath_->Transform(Vector3(positionReticle->x,positionReticle->y,positionReticle->z), matViewProjectionViewport);
+		positionReticle->x = positionReticle->x * matViewProjectionViewport.m[0][0] + positionReticle->y * matViewProjectionViewport.m[1][0] + positionReticle->z * matViewProjectionViewport.m[2][0] +
+		                     1.0f * matViewProjectionViewport.m[3][0];
+		positionReticle->y = positionReticle->x * matViewProjectionViewport.m[0][1] + positionReticle->y * matViewProjectionViewport.m[1][1] + positionReticle->z * matViewProjectionViewport.m[2][1] +
+		                     1.0f * matViewProjectionViewport.m[3][1];
+		positionReticle->z = positionReticle->x * matViewProjectionViewport.m[0][2] + positionReticle->y * matViewProjectionViewport.m[1][2] + positionReticle->z * matViewProjectionViewport.m[2][2] +
+		                     1.0f * matViewProjectionViewport.m[3][2];
+		float w = positionReticle->x * matViewProjectionViewport.m[0][3] + positionReticle->y * matViewProjectionViewport.m[1][3] + positionReticle->z * matViewProjectionViewport.m[2][3] +
+		          1.0f * matViewProjectionViewport.m[3][3];
+		assert(w != 0.0f);
+		positionReticle->x /= w;
+		positionReticle->y /= w;
+		positionReticle->z /= w;
+
+		// スプライトのレティクルに座標設定
+		for (Sprite* sprite2DReticle : sprite2DReticle_) {
+			sprite2DReticle->SetPosition(Vector2(positionReticle->x, positionReticle->y));
+		}
+	}*/
+
+
+	positionReticle_.x = worldTransform3DReticle_.matWorld_.m[3][0];
+	positionReticle_.y = worldTransform3DReticle_.matWorld_.m[3][1];
+	positionReticle_.z = worldTransform3DReticle_.matWorld_.m[3][2];
 
 	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
 	Matrix4x4 matViewProjectionViewport = calculationMath_->Multiply(calculationMath_->Multiply(viewProjection.matView, viewProjection.matProjection), matViewPort);
 
 	// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
-	positionReticle = calculationMath_->Transform(positionReticle, matViewProjectionViewport);
+	positionReticle_ = calculationMath_->Transform(positionReticle_, matViewProjectionViewport);
 
 	// スプライトのレティクルに座標設定
-	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+	sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+
+
 
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
 bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) { 
+	/* for (Sprite* sprite2DReticle : sprite2DReticle_) {
+
+		for (Enemy* enemy : enemys) {
+			enemyPos = enemy->ChangeScreenPos(viewProjection);
+
+			length = calculationMath_->Length({sprite2DReticle->GetPosition().x, sprite2DReticle->GetPosition().y, 0}, enemyPos);
+
+			if (length <= 20.0f) {
+				sprite2DReticle->SetPosition({enemyPos.x, enemyPos.y});
+
+				rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();
+				rockOnVelocity = kBulletSpeed * calculationMath_->Normalize(rockOnVelocity);
+
+				return isRockon = true;
+			}
+		}
+	}
+	return isRockon = false;*/
 	Vector2 reticlePos = sprite2DReticle_->GetPosition();
 
-	float length = 100.0f;
 	for (Enemy* enemy : enemys) {
 		enemyPos = enemy->ChangeScreenPos(viewProjection);
 
 		length = calculationMath_->Length({reticlePos.x, reticlePos.y, 0}, enemyPos);
 
 		if (length <= 20.0f) {
-			sprite2DReticle_->SetPosition({enemyPos.x,enemyPos.y});
+			sprite2DReticle_->SetPosition({enemyPos.x, enemyPos.y});
 
 			rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();
 			rockOnVelocity = kBulletSpeed * calculationMath_->Normalize(rockOnVelocity);
-			
+
 			return isRockon = true;
-		} 
-	}	
+		}
+	}
 
 	return isRockon = false;
 }
+
+//void Player::AddReticle(Sprite* sprite) { 
+//	sprite2DReticle_.push_back(sprite);
+//}

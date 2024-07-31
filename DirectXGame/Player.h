@@ -18,7 +18,7 @@ public:
 
 	void Initialize(Model* model, uint32_t font,Vector3 position);
 
-	void Update(ViewProjection& viewProjection);
+	void Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys);
 
 	void Draw(ViewProjection& viewProjection);
 
@@ -51,8 +51,6 @@ public:
 	void PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 	bool IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection);
-
-	//void AddReticle(Sprite* sprite);
 
 private:
 	// ワールド変換データ
@@ -87,14 +85,10 @@ private:
 	uint32_t textureReticle = 0;
 
 	//2Dレティクル用のスプライト
-	//std::list<Sprite*> sprite2DReticle_ = {0, 0, 0};
+	std::list<Sprite*> sprite2DReticle_ ;
 
-	//std::list<Vector2*> spritePosition_;
-
-	//std::list<Vector3*> positionReticle_;
-
-	Sprite* sprite2DReticle_ = nullptr;
-	Vector2 spritePosition_;
+	Sprite* s2DReticle_ = nullptr;
+	Vector2 spritePos_;
 	Vector3 positionReticle_ = {0, 0, 0};
 
 	ViewProjection viewProjection_;
@@ -106,9 +100,4 @@ private:
 	Vector3 enemyPos{0, 0, 0};
 
 	float length = 100.0f;
-
-	bool preRockOn = false;
-	bool isLeave = false;
-	float t = 0;
-
 };

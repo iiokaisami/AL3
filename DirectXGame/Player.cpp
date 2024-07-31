@@ -12,20 +12,14 @@ Player::~Player() {
 		delete bullet;
 	}
 
-	/*for (Sprite* sprite2DReticle : sprite2DReticle_) {
+	delete s2DReticle_;
+
+	for (Sprite* sprite2DReticle : sprite2DReticle_) {
 		delete sprite2DReticle;
 	}
-
-	for (Vector2* spritePosition : spritePosition_) {
-		delete spritePosition;
-	}
-
-	for (Vector3* positionReticle : positionReticle_) {
-		delete positionReticle;
-	}*/
 }
 
-void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
+void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 	// NULLポインタチェック
 	assert(model);
@@ -42,19 +36,17 @@ void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
 	calculationMath_ = new CalculationMath;
 
 	radius_ = 2.0f;
-	
+
 	// 3Dレティクル用のワールドトランスフォーム初期化
 	worldTransform3DReticle_.Initialize();
 
-	//レティクル用テクスチャ取得
+	// レティクル用テクスチャ取得
 	textureReticle = TextureManager::Load("reticle.png");
 
 	// スプライト生成
-	//for (Sprite* sprite2DReticle : sprite2DReticle_) {
-		// sprite2DReticle = new Sprite;
-		//  AddReticle(sprite2DReticle);
-		sprite2DReticle_ = Sprite::Create(textureReticle, {}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
-	//}
+	s2DReticle_ = Sprite::Create(textureReticle, {}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
+	sprite2DReticle_.push_back(s2DReticle_);
 
 	viewProjection_.Initialize();
 
@@ -62,9 +54,13 @@ void Player::Initialize(Model* model, uint32_t font,Vector3 position) {
 
 	SetCollisionMask(0b1 << 1);
 
+	for (Sprite* sprite2DReticle : sprite2DReticle_) {
+
+		sprite2DReticle = Sprite::Create(textureReticle, {}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	}
 };
 
-void Player::Update(ViewProjection& viewProjection) {
+void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
 
 	worldTransformBlock.UpdateMatrix();
 
@@ -149,35 +145,11 @@ void Player::Update(ViewProjection& viewProjection) {
 
 	PlayerReticle(matViewPort, viewProjection);
 
-	/*if (!isRockon && preRockOn) {
-		isLeave = true;
-	}
 
-	if (isLeave) {
-		Vector3 pos = calculationMath_->Lerp({positionReticle.x, positionReticle.y, 0}, positionReticle, t);
-		t += 1.0f / 50.0f;
-		sprite2DReticle_->SetPosition({pos.x, pos.y});
+	s2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+	
 
-		if (t > 1.0f) {
-			B = false;
-			t = 0;
-		}
-	} else {
-		sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
-	}*/
-
-	preRockOn = isRockon;
-
-
-	//if (isRockon)
-	//{
-		//for (Sprite* sprite2DReticle : sprite2DReticle_) {
-			//sprite2DReticle = new Sprite;
-			//AddReticle(sprite2DReticle);
-		//}
-	//}
-
-	IsRockon(enemys_, viewProjection);
+	IsRockon(enemys, viewProjection);
 
 
 	/////// キャラクターの攻撃////////
@@ -234,7 +206,6 @@ void Player::Attack() {
 		// 弾を登録する
 		bullets_.push_back(newBullet);
 	}
-
 };
 
 void Player::Draw(ViewProjection& viewProjection) {
@@ -270,14 +241,18 @@ void Player::SetParent(const WorldTransform* parent) {
 }
 
 void Player::DrawUI() {
-	//for (Sprite* sprite2DReticle : sprite2DReticle_) {
+
+	for (Sprite* sprite2DReticle : sprite2DReticle_) {
 		if (isRockon) {
-			sprite2DReticle_->SetColor({1.0f, 0, 0, 1.0f});
-		} /*else {
-			sprite2DReticle->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-		}*/
-		sprite2DReticle_->Draw();
-	//}
+
+			sprite2DReticle->SetPosition({enemyPos.x, enemyPos.y});
+		
+		}
+
+		sprite2DReticle->Draw();
+	}
+
+	s2DReticle_->Draw();
 }
 
 // マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
@@ -413,35 +388,6 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	///////3Dレコードレティクルのワールド座標から2Dレティクルのスクリーン座標を計算//////
-	/* for (Vector3* positionReticle : positionReticle_) {
-		positionReticle->x = worldTransform3DReticle_.matWorld_.m[3][0];
-		positionReticle->y = worldTransform3DReticle_.matWorld_.m[3][1];
-		positionReticle->z = worldTransform3DReticle_.matWorld_.m[3][2];
-
-		// ビュー行列とプロジェクション行列、ビューポート行列を合成する
-		Matrix4x4 matViewProjectionViewport = calculationMath_->Multiply(calculationMath_->Multiply(viewProjection.matView, viewProjection.matProjection), matViewPort);
-
-		// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
-		//positionReticle = calculationMath_->Transform(Vector3(positionReticle->x,positionReticle->y,positionReticle->z), matViewProjectionViewport);
-		positionReticle->x = positionReticle->x * matViewProjectionViewport.m[0][0] + positionReticle->y * matViewProjectionViewport.m[1][0] + positionReticle->z * matViewProjectionViewport.m[2][0] +
-		                     1.0f * matViewProjectionViewport.m[3][0];
-		positionReticle->y = positionReticle->x * matViewProjectionViewport.m[0][1] + positionReticle->y * matViewProjectionViewport.m[1][1] + positionReticle->z * matViewProjectionViewport.m[2][1] +
-		                     1.0f * matViewProjectionViewport.m[3][1];
-		positionReticle->z = positionReticle->x * matViewProjectionViewport.m[0][2] + positionReticle->y * matViewProjectionViewport.m[1][2] + positionReticle->z * matViewProjectionViewport.m[2][2] +
-		                     1.0f * matViewProjectionViewport.m[3][2];
-		float w = positionReticle->x * matViewProjectionViewport.m[0][3] + positionReticle->y * matViewProjectionViewport.m[1][3] + positionReticle->z * matViewProjectionViewport.m[2][3] +
-		          1.0f * matViewProjectionViewport.m[3][3];
-		assert(w != 0.0f);
-		positionReticle->x /= w;
-		positionReticle->y /= w;
-		positionReticle->z /= w;
-
-		// スプライトのレティクルに座標設定
-		for (Sprite* sprite2DReticle : sprite2DReticle_) {
-			sprite2DReticle->SetPosition(Vector2(positionReticle->x, positionReticle->y));
-		}
-	}*/
-
 
 	positionReticle_.x = worldTransform3DReticle_.matWorld_.m[3][0];
 	positionReticle_.y = worldTransform3DReticle_.matWorld_.m[3][1];
@@ -454,52 +400,37 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	positionReticle_ = calculationMath_->Transform(positionReticle_, matViewProjectionViewport);
 
 	// スプライトのレティクルに座標設定
-	sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+	s2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
 
-
+	for (Sprite* sprite2DReticle : sprite2DReticle_) {
+		sprite2DReticle->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
-bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) { 
-	/* for (Sprite* sprite2DReticle : sprite2DReticle_) {
+bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) {
 
 		for (Enemy* enemy : enemys) {
-			enemyPos = enemy->ChangeScreenPos(viewProjection);
 
-			length = calculationMath_->Length({sprite2DReticle->GetPosition().x, sprite2DReticle->GetPosition().y, 0}, enemyPos);
+			for (Sprite* sprite2DReticle : sprite2DReticle_) {
+				
+				//sprite2DReticle = Sprite::Create(textureReticle, {}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 
-			if (length <= 20.0f) {
-				sprite2DReticle->SetPosition({enemyPos.x, enemyPos.y});
+				enemyPos = enemy->ChangeScreenPos(viewProjection);
 
-				rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();
-				rockOnVelocity = kBulletSpeed * calculationMath_->Normalize(rockOnVelocity);
+				length = calculationMath_->Length({sprite2DReticle->GetPosition().x, sprite2DReticle->GetPosition().y, 0}, enemyPos);
 
-				return isRockon = true;
+				if (length <= 20.0f) {
+				    sprite2DReticle_.push_back(s2DReticle_);
+
+
+					rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();
+					rockOnVelocity = kBulletSpeed * calculationMath_->Normalize(rockOnVelocity);
+
+					return isRockon = true;
+				}
 			}
 		}
-	}
-	return isRockon = false;*/
-	Vector2 reticlePos = sprite2DReticle_->GetPosition();
-
-	for (Enemy* enemy : enemys) {
-		enemyPos = enemy->ChangeScreenPos(viewProjection);
-
-		length = calculationMath_->Length({reticlePos.x, reticlePos.y, 0}, enemyPos);
-
-		if (length <= 20.0f) {
-			sprite2DReticle_->SetPosition({enemyPos.x, enemyPos.y});
-
-			rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();
-			rockOnVelocity = kBulletSpeed * calculationMath_->Normalize(rockOnVelocity);
-
-			return isRockon = true;
-		}
-	}
-
-	return isRockon = false;
+	    return isRockon = false;
 }
-
-//void Player::AddReticle(Sprite* sprite) { 
-//	sprite2DReticle_.push_back(sprite);
-//}

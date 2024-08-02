@@ -228,7 +228,7 @@ void GameScene::Draw() {
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
 
-	player_->DrawUI();
+	player_->DrawUI(viewProjection_);
 	
 	railCamera_->Draw();
 

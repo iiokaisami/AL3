@@ -27,6 +27,8 @@ public:
 	// ワールド座標を取得
 	Vector3 GetWorldPosition() override;
 
+	Vector3 GetWorld3DReticlePosition();
+
 	//衝突を検出したら呼び出されるコールバック関数
 	void OnCollision() override;
 
@@ -41,16 +43,20 @@ public:
     /// <summary>
     /// Ui描画
     /// </summary>
-	void DrawUI();
+	void DrawUI(ViewProjection& viewProjection);
 
 	// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
-	//void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
+	void MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 	void SetEnemy(std::list<Enemy*> enemy) { enemys_ = enemy; }
 
 	void PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
 
 	bool IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection);
+
+	void MultiLockOn(ViewProjection& viewProjection);
+
+	void LockOnRemove(); 
 
 private:
 	// ワールド変換データ
@@ -85,9 +91,10 @@ private:
 	uint32_t textureReticle = 0;
 
 	//2Dレティクル用のスプライト
-	std::list<Sprite*> sprite2DReticle_ ;
+	std::list<Sprite*> lockOnSprite2DReticle_ ;
+	std::list<Enemy*> lockOnEnemys_;
 
-	Sprite* s2DReticle_ = nullptr;
+	Sprite* sprite2DReticle_ = nullptr;
 	Vector2 spritePos_;
 	Vector3 positionReticle_ = {0, 0, 0};
 
@@ -98,6 +105,8 @@ private:
 	bool isRockon = false;
 
 	Vector3 enemyPos{0, 0, 0};
+	Vector3 lockOnyPos{0, 0, 0};
 
 	float length = 100.0f;
+	float reticleRadius_ = 35.0f;
 };

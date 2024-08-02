@@ -57,6 +57,10 @@ float CalculationMath::Length(const Vector3& v) {
 	return result;
 }
 
+float CalculationMath::Length(const Vector2& v) {
+	return sqrtf(v.x * v.x + v.y * v.y);
+}
+
 // 正規化 v/||v||
 Vector3 CalculationMath::Normalize(const Vector3& v) {
 	Vector3 result;

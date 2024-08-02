@@ -41,6 +41,8 @@ public:
 	// 長さ(ノルム)
 	float Length(const Vector3& v);
 
+    float Length(const Vector2& v);
+
 	// 正規化 v/||v||
 	Vector3 Normalize(const Vector3& v);
 

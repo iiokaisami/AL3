@@ -1,5 +1,26 @@
 #include "Operator.h"
 
+Vector2 operator+(const Vector2& v1, const Vector2& v2) {
+	Vector2 result;
+	result.x = v1.x + v2.x;
+	result.y = v1.y + v2.y;
+	return result;
+}
+Vector2 operator-(const Vector2& v1, const Vector2& v2) {
+	Vector2 result;
+	result.x = v1.x - v2.x;
+	result.y = v1.y - v2.y;
+	return result;
+}
+Vector2 operator*(float scalar, const Vector2& v) {
+	Vector2 result;
+	result.x = scalar * v.x;
+	result.y = scalar * v.y;
+	return result;
+}
+Vector2 operator*(const Vector2& v, float s) { return s * v; }
+Vector2 operator/(const Vector2& v, float s) { return 1.0f / s * v; }
+
 Vector3 operator+(const Vector3& v1, const Vector3& v2) { 
 	Vector3 result;
 	result.x = v1.x + v2.x;

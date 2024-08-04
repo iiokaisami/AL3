@@ -18,6 +18,10 @@ public:
 
 	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
+	void SetPosition(Vector3 position) { worldTransform_.translation_ = position; }
+
+	void SetRotation(Vector3 rotation) { worldTransform_.rotation_ = rotation; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;

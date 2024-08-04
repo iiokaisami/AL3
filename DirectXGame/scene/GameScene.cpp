@@ -51,7 +51,7 @@ void GameScene::Initialize() {
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
-	Vector3 playerPosition(0, 0, 30.0f);
+	Vector3 playerPosition(0, 0, 0);
 	player_->Initialize(model_, texture_,playerPosition);
 
 	 
@@ -65,7 +65,7 @@ void GameScene::Initialize() {
 	 skydome_->Initialize(modelSkydome_);
 
 	 railCamera_ = new RailCamera;
-	 railCamera_->Initialize({0, 0, 0}, {0, 0, 0},viewProjection_);
+	 railCamera_->Initialize({0, 0, 10.0f}, {0, 0, 0},viewProjection_);
 
 	 //自キャラとレールカメラの親子関係を結ぶ
 	 player_->SetParent(&railCamera_->GetWorldTransform());
@@ -113,6 +113,9 @@ void GameScene::Update() {
 
 	//自キャラの更新
 	player_->Update(viewProjection_,enemys_);
+
+	railCamera_->SetPosition(player_->GetWorldPosition());
+	railCamera_->SetRotation(player_->GetRotation());
 
 	UpdateEnemyPopCommands();
 

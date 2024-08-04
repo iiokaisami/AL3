@@ -58,6 +58,8 @@ public:
 
 	void LockOnRemove(); 
 
+	Vector3 GetRotation() { return worldTransformBlock.rotation_; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransformBlock;

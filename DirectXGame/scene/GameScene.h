@@ -14,7 +14,7 @@
 #include "RailCamera.h"
 #include "CollisionManager.h"
 #include <sstream>
-
+#include <memory>
 
 /// <summary>
 /// ゲームシーン
@@ -47,17 +47,20 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
-	void AddEnemyBullet(EnemyBullet* enemyBullet);
+	//void AddEnemyBullet(EnemyBullet* enemyBullet);
+
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() const { return enemyBullets_; }
 
-	void AddEnemy(Vector3 position);
+	//void AddEnemy(Vector3 position);
+	
 	// 敵リストを取得
 	const std::list<Enemy*>& GetEnemy() const { return enemys_; }
 
 	//敵発生コマンド
 	std::stringstream enemyPopCommands;
 
+	/*
     /// <summary>
     /// 敵発生データの読み込み
     /// </summary>
@@ -67,7 +70,7 @@ public: // メンバ関数
     /// 敵発生のコマンド更新
     /// </summary>
 	void UpdateEnemyPopCommands();
-
+	*/
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;

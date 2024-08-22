@@ -55,7 +55,7 @@ void GameScene::Initialize() {
 	player_->Initialize(model_, texture_,playerPosition);
 
 	 
-	LoadEnemyPopData();
+	//LoadEnemyPopData();
 	 
 
 	 // 3Dモデルの生成
@@ -114,7 +114,7 @@ void GameScene::Update() {
 	//自キャラの更新
 	player_->Update(viewProjection_,enemys_);
 
-	UpdateEnemyPopCommands();
+	//UpdateEnemyPopCommands();
 
 	// デスフラグの立った敵を削除
 	enemys_.remove_if([](Enemy* enemy) {
@@ -150,7 +150,7 @@ void GameScene::Update() {
 				newBullet->SetPlayer(player_);
 
 				// 弾を登録する
-				AddEnemyBullet(newBullet);
+				//AddEnemyBullet(newBullet);
 
 				enemy->SetIsFire(false);
 			}
@@ -243,7 +243,7 @@ void GameScene::Draw() {
 }
 
 
-
+/*
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	// リストに登録
 	enemyBullets_.push_back(enemyBullet);
@@ -345,3 +345,4 @@ void GameScene::UpdateEnemyPopCommands() {
 		}
 	}
 }
+*/

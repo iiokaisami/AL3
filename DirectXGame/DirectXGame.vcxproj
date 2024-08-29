@@ -114,7 +114,7 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Enemy123.cpp" />
+    <ClCompile Include="Enemy2.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
     <ClCompile Include="EnemyStateApproach.cpp" />
     <ClCompile Include="EnemyStateLeave.cpp" />
@@ -159,7 +159,7 @@
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Enemy123.h" />
+    <ClInclude Include="Enemy2.h" />
     <ClInclude Include="EnemyBullet.h" />
     <ClInclude Include="EnemyStateApproach.h" />
     <ClInclude Include="EnemyStateLeave.h" />

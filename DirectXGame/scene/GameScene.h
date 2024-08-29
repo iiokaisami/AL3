@@ -18,7 +18,7 @@
 #include <sstream>
 #include <memory>
 
-#include "Enemy123.h"
+#include "Enemy2.h"
 
 /// <summary>
 /// ゲームシーン

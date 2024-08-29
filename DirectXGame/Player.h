@@ -109,4 +109,9 @@ private:
 
 	float length = 100.0f;
 	float reticleRadius_ = 35.0f;
+
+
+	float jamp = 90.0f;
+	float jampTime = 20.0f;
+	bool isJ = false;
 };

@@ -14,6 +14,8 @@ GameScene::~GameScene() {
 	delete skydome_;
 	delete modelSkydome_;
 	delete railCamera_;
+	delete ground_;
+	delete modelGround_;
 	delete colliderManager_;
 	delete calculationMath_; 
 
@@ -24,6 +26,8 @@ GameScene::~GameScene() {
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
 	}
+
+	delete enemy123;
 }
 
 void GameScene::Initialize() {
@@ -32,7 +36,7 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	texture_ = TextureManager::Load("debugfont.png");
+	texture_ = TextureManager::Load("sample.png");
 	model_ = Model::Create();
 
 	// ビュープロジェクションの初期化
@@ -51,7 +55,7 @@ void GameScene::Initialize() {
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
-	Vector3 playerPosition(0, 0, 30.0f);
+	Vector3 playerPosition(0, 0, 20.0f);
 	player_->Initialize(model_, texture_,playerPosition);
 
 	 
@@ -60,12 +64,19 @@ void GameScene::Initialize() {
 
 	 // 3Dモデルの生成
 	 modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+ 	 modelGround_ = Model::CreateFromOBJ("ground", true);
 
 	 skydome_ = new Skydome;
 	 skydome_->Initialize(modelSkydome_);
 
+	 ground_ = new Ground;
+	 ground_->Initialize(modelGround_);
+
 	 railCamera_ = new RailCamera;
 	 railCamera_->Initialize({0, 0, 0}, {0, 0, 0},viewProjection_);
+
+	 enemy123 = new Enemy123();
+	 enemy123->Initialize(model_, {0, 10.0f, 40.0f});
 
 	 //自キャラとレールカメラの親子関係を結ぶ
 	 player_->SetParent(&railCamera_->GetWorldTransform());
@@ -156,6 +167,9 @@ void GameScene::Update() {
 			}
 		}
 	}
+
+	enemy123->Update();
+
 	player_->SetEnemy(enemys_);
 
 	// 敵弾更新
@@ -170,6 +184,8 @@ void GameScene::Update() {
 
 	// コライダーをリストに登録
 	colliderManager_->UpData(player_, playerBullets, GetBullets(), GetEnemy());
+
+	ground_->Update();
 
 	skydome_->Update();
 }
@@ -201,6 +217,7 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	skydome_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 	player_->Draw(viewProjection_);
 
 	
@@ -212,6 +229,7 @@ void GameScene::Draw() {
 		}
 	}
 	
+	enemy123->Draw(viewProjection_);
 
 	// 弾描画
 	for (EnemyBullet* bullet : enemyBullets_) {

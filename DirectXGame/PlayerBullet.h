@@ -3,6 +3,11 @@
 #include "WorldTransform.h"
 #include "Collider.h"
 
+
+
+#include "Input.h"
+
+
 class PlayerBullet : public Collider 
 {
 public:
@@ -55,4 +60,7 @@ private:
 	// 半径
 	float radius_ = 0;
 
+
+	// キーボード入力
+	Input* input_ = nullptr;
 };

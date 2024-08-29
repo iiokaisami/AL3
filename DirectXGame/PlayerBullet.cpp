@@ -29,6 +29,10 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	SetCollisionAttribute(0b1);
 
 	SetCollisionMask(0b1 << 1);
+
+
+	// シングルトンインスタンスを取得する
+	input_ = Input::GetInstance();
 }
 
 void PlayerBullet::Update() {
@@ -40,6 +44,11 @@ void PlayerBullet::Update() {
 
 	//時間経過でデス
 	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
+
+	if (input_->TriggerKey(DIK_RETURN))
+	{
 		isDead_ = true;
 	}
 }

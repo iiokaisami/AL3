@@ -13,8 +13,11 @@
 #include "Skydome.h"
 #include "RailCamera.h"
 #include "CollisionManager.h"
+#include "Ground.h"
 #include <sstream>
 #include <memory>
+
+#include "Enemy123.h"
 
 /// <summary>
 /// ゲームシーン
@@ -94,6 +97,7 @@ private: // メンバ変数
 	ViewProjection viewProjection_;
 	Skydome* skydome_ = nullptr;
 	RailCamera* railCamera_ = nullptr;
+	Ground* ground_ = nullptr;
 
 	// 敵弾
 	std::list<EnemyBullet*> enemyBullets_;
@@ -101,8 +105,11 @@ private: // メンバ変数
 	//敵
 	std::list<Enemy*> enemys_;
 
+	Enemy123* enemy123 = nullptr;
+
 	//3Dモデル
 	Model* modelSkydome_ = nullptr;
+	Model* modelGround_ = nullptr;
 
 	//待機中フラグ
 	bool isWaiting = true;

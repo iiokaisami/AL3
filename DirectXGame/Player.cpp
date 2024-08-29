@@ -41,6 +41,7 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 	// 3Dレティクル用のワールドトランスフォーム初期化
 	worldTransform3DReticle_.Initialize();
+	worldTransformBlock.translation_ = {0, 0.0f, 0};
 
 	// レティクル用テクスチャ取得
 	textureReticle = TextureManager::Load("reticle.png");
@@ -77,7 +78,7 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	});
 
 	// 回転速さ[ラジアン/frame]
-	const float kRotSpeed = 0.02f;
+	/* const float kRotSpeed = 0.02f;
 
 	// 押した方向で移動ベクトルを変更
 	if (input_->PushKey(DIK_A)) {
@@ -87,28 +88,50 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	} else if (input_->PushKey(DIK_D)) {
 
 		worldTransformBlock.rotation_.y -= kRotSpeed;
-	}
+	}*/
 
 	// 押した方向で移動ベクトルを変更（左右）
-	if (input_->PushKey(DIK_LEFT)) {
+	if (input_->PushKey(DIK_A)) {
 
 		move.x -= kCharacterSpeed;
 
-	} else if (input_->PushKey(DIK_RIGHT)) {
+	} else if (input_->PushKey(DIK_D)) {
 		
 		move.x += kCharacterSpeed;
 	}
 
 	// 押した方向で移動ベクトルを変更（上下）
-	if (input_->PushKey(DIK_DOWN)) {
+	if (input_->PushKey(DIK_S)) {
 
-		move.y -= kCharacterSpeed;
+		move.z -= kCharacterSpeed;
 	
-	} else if (input_->PushKey(DIK_UP)) {
+	} else if (input_->PushKey(DIK_W)) {
 
-		move.y += kCharacterSpeed;
+		move.z += kCharacterSpeed;
 	}
 
+
+	if (input_->PushKey(DIK_SPACE) && !isJ){
+		jamp = jampTime;
+		isJ = true;
+	}
+
+	if (isJ) {
+		jamp -= 1.0f;
+
+		if (jamp <= 20.0f && jamp >= 10.0f) {
+			worldTransformBlock.translation_.y += 0.3f;
+		}
+
+		if (jamp < 10.0f && jamp >= 0.0f) {
+			worldTransformBlock.translation_.y -= 0.3f;
+		}
+
+		if (jamp < 0)
+		{
+			isJ = false;
+		}
+	}
 
 	// ゲームパッドの状態を得る変数（XINPUT）
 	XINPUT_STATE joyState;
@@ -156,7 +179,7 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 };
 
 void Player::Attack() {
-	if (input_->TriggerKey(DIK_SPACE)) {
+	if (input_->TriggerKey(DIK_LSHIFT)) {
 
 		// 速度ベクトルを自機の向きに合わせて回転させる
 		velocity = calculationMath_->TransformNormal(velocity, worldTransformBlock.matWorld_);

@@ -4,7 +4,8 @@
 #include "TextureManager.h"
 #include "WinApp.h"
 #include "Enemy.h"
-
+#include <cmath>
+#include <numbers>
 
 Player::~Player() {
 	delete calculationMath_;
@@ -22,16 +23,49 @@ Player::~Player() {
 
 }
 
-void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
+void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm,Model* modelBullet) {
 
 	// NULLポインタチェック
-	assert(model);
-	model_ = model;
-	font_ = font;
+	assert(modelBody);
+	assert(modelHead);
+	assert(modelL_arm);
+	assert(modelR_arm);
 
-	worldTransformBlock.Initialize();
+	//assert(model);
+	//model_ = model;
+	//font_ = font;
 
-	worldTransformBlock.translation_ = position;
+	modelBody_ = modelBody;
+	modelHead_ = modelHead;
+	modelL_arm_ = modelL_arm;
+	modelR_arm_ = modelR_arm;
+
+	modelBullet_ = modelBullet;
+
+
+	worldTransform_.Initialize();
+	
+	worldTransformBody_.Initialize();
+	//worldTransformBody_.translation_ = {0.0f, 4.0f, 0.0f};
+
+	worldTransformHead_.Initialize();
+	worldTransformHead_.translation_ = {0.0f, 1.5f, 0.0f};
+
+	worldTransformL_arm_.Initialize();
+	worldTransformL_arm_.translation_ = {-0.35f, 1.35f, 0.0f};
+
+	worldTransformR_arm_.Initialize();
+	worldTransformR_arm_.translation_ = {0.35f, 1.35f, 0.0f};
+
+
+	// パーツ同士の親子関係
+	worldTransformBody_.parent_ = &worldTransform_;
+	worldTransformHead_.parent_ = &worldTransformBody_;
+	worldTransformL_arm_.parent_ = &worldTransformBody_;
+	worldTransformR_arm_.parent_ = &worldTransformBody_;
+
+
+	InitializeFloatingGimick();
 
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -42,7 +76,7 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 	// 3Dレティクル用のワールドトランスフォーム初期化
 	worldTransform3DReticle_.Initialize();
-	worldTransformBlock.translation_ = {0, 0.0f, 0};
+	worldTransform_.translation_ = {0, 1.0f, 0};
 
 	// レティクル用テクスチャ取得
 	textureReticle = TextureManager::Load("reticle.png");
@@ -59,7 +93,9 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
 
-	worldTransformBlock.UpdateMatrix();
+	UpdateFloatingGimick();
+
+	worldTransform_.UpdateMatrix();
 
 	// キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
@@ -123,11 +159,11 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 		jamp -= 1.0f;
 
 		if (jamp <= 20.0f && jamp >= 10.0f) {
-			worldTransformBlock.translation_.y += 0.3f;
+			worldTransform_.translation_.y += 0.3f;
 		}
 
 		if (jamp < 10.0f && jamp >= 0.0f) {
-			worldTransformBlock.translation_.y -= 0.3f;
+			worldTransform_.translation_.y -= 0.3f;
 		}
 
 		if (jamp < 0)
@@ -185,7 +221,7 @@ void Player::Attack() {
 	if (input_->TriggerKey(DIK_LSHIFT)) {
 
 		// 速度ベクトルを自機の向きに合わせて回転させる
-		velocity = calculationMath_->TransformNormal(velocity, worldTransformBlock.matWorld_);
+		velocity = calculationMath_->TransformNormal(velocity, worldTransform_.matWorld_);
 
 		// 自機から標準オブジェクトへのベクトル
 		//velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
@@ -197,7 +233,7 @@ void Player::Attack() {
 
 		    // 弾を生成し、初期化
 			PlayerBullet* newBullet = new PlayerBullet();
-			newBullet->Initialize(model_, GetWorldPosition(), velocity);
+			newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
 
 			// 弾を登録する
 			bullets_.push_back(newBullet);
@@ -210,7 +246,7 @@ void Player::Attack() {
 
 					// 弾を生成し、初期化
 					PlayerBullet* newBullet = new PlayerBullet();
-					newBullet->Initialize(model_, GetWorldPosition(), velocity);
+					newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
 
 					// 弾を登録する
 					bullets_.push_back(newBullet);
@@ -242,7 +278,7 @@ void Player::Attack() {
 
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, GetWorldPosition(), velocity);
+		newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
 
 		// 弾を登録する
 		bullets_.push_back(newBullet);
@@ -250,7 +286,10 @@ void Player::Attack() {
 };
 
 void Player::Draw() {
-	model_->Draw(worldTransformBlock, *viewProjection_, font_);
+	modelBody_->Draw(worldTransformBody_, *viewProjection_);
+	modelHead_->Draw(worldTransformHead_, *viewProjection_);
+	modelL_arm_->Draw(worldTransformL_arm_, *viewProjection_);
+	modelR_arm_->Draw(worldTransformR_arm_, *viewProjection_);
 
 	// 弾描画
 	for (PlayerBullet* bullet : bullets_) {
@@ -281,33 +320,74 @@ void Player::Move() {
 
 		// 移動
 		//calculationMath_->Add(worldTransformBlock.translation_, move_);
-		worldTransformBlock.translation_.x += velocity_.x;
-		worldTransformBlock.translation_.z += velocity_.z;
+		worldTransform_.translation_.x += velocity_.x;
+		worldTransform_.translation_.z += velocity_.z;
 
 	}
 
 	// 行列の計算
-	worldTransformBlock.UpdateMatrix();
+	worldTransform_.UpdateMatrix();
 }
 
 void Player::Turn(){
 	//Y軸周り角度(0ｙ)
-	worldTransformBlock.rotation_.y = std::atan2(velocity.x, velocity.z);
-	float velocityX = calculationMath_->Length({velocity.x, 0.0f, 0.0f});
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+	float velocityX = calculationMath_->Length({velocity_.x, 0.0f, 0.0f});
 	// X軸周り角度(0x)
-	worldTransformBlock.rotation_.x = std::atan2(0.0f, velocityX);
+	worldTransform_.rotation_.x = std::atan2(0.0f, velocityX);
 
-	worldTransformBlock.UpdateMatrix();
+	worldTransform_.UpdateMatrix();
 };
+
+void Player::InitializeFloatingGimick() {
+	floatingParameter_ = 0.0f;
+	floatingAmplitude_ = 0.4f;
+	floatingCycle_ = 120;
+}
+
+void Player::UpdateFloatingGimick() {
+	ImGui::Begin("Floating Model");
+	ImGui::SliderFloat3("Base Translation", &worldTransform_.translation_.x, -20.0f, 20.0f);
+	ImGui::SliderFloat3("Head Translation", &worldTransformHead_.translation_.x, -20.0f, 20.0f);
+	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.translation_.x, -20.0f, 20.0f);
+	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.translation_.x, -20.0f, 20.0f);
+	int cycle = static_cast<int>(floatingCycle_);
+	ImGui::SliderInt("Cycle", &cycle, 0, 600);
+	floatingCycle_ = static_cast<uint16_t>(cycle);
+
+	ImGui::SliderFloat("Amplitude", &floatingAmplitude_, 0.0f, 10.0f);
+
+	ImGui::End();
+
+	const float step = 2.0f * std::numbers::pi_v<float> / floatingCycle_;
+
+	// パラメータを１ステップ分加算
+	floatingParameter_ += step;
+
+	// 2πを超えたら０に戻す
+	floatingParameter_ = std::fmod(floatingParameter_, 2.0f * std::numbers::pi_v<float>);
+
+	// 浮遊を座標に反映
+	worldTransformBody_.translation_.y = std::sin(floatingParameter_) * floatingAmplitude_;
+
+	// 手をぶらぶら揺らす
+	worldTransformL_arm_.rotation_.x = std::cos(floatingParameter_) * floatingAmplitude_;
+	worldTransformR_arm_.rotation_.x = std::cos(floatingParameter_) * floatingAmplitude_;
+
+	worldTransformBody_.UpdateMatrix();
+	worldTransformHead_.UpdateMatrix();
+	worldTransformL_arm_.UpdateMatrix();
+	worldTransformR_arm_.UpdateMatrix();
+}
 
 Vector3 Player::GetWorldPosition(){
 	//ワールド座標を入れる変数
 	Vector3 worldPos;
 
 	//ワールド座標の平行移動成分を取得(ワールド座標)
-	worldPos.x = worldTransformBlock.matWorld_.m[3][0];
-	worldPos.y = worldTransformBlock.matWorld_.m[3][1];
-	worldPos.z = worldTransformBlock.matWorld_.m[3][2];
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
 }
@@ -324,8 +404,8 @@ void Player::OnCollision() {
 	// 何もしない
 }
 
-void Player::SetParent(const WorldTransform* parent) {
-	worldTransformBlock.parent_ = parent;
+void Player::SetParent(const WorldTransform* parent) { 
+	worldTransform_.parent_ = parent; 
 }
 
 void Player::DrawUI(ViewProjection& viewProjection) {
@@ -456,7 +536,7 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	Vector3 offset = {0, 0, kDistancePlayerTo3DReticle};
 
 	// 自機のワールド行列の回転を反映
-	offset = calculationMath_->Transform(offset, worldTransformBlock.matWorld_);
+	offset = calculationMath_->Transform(offset, worldTransform_.matWorld_);
 
 	// ベクトルの長さを整える
 	offset = calculationMath_->Multiply(kDistancePlayerTo3DReticle, calculationMath_->Normalize(offset));

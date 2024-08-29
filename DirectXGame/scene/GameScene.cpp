@@ -37,7 +37,7 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	texture_ = TextureManager::Load("sample.png");
+	//texture_ = TextureManager::Load("sample.png");
 	model_ = Model::Create();
 
 	// ビュープロジェクションの初期化
@@ -53,11 +53,20 @@ void GameScene::Initialize() {
 	//軸方向表示が参照するビュープロジェクションを指定する（アドレス渡し）
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
+
+	// モデル
+	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
+	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
+	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
+	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+
+	modelBullet_.reset(Model::CreateFromOBJ("hammer", true));
+
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
 	Vector3 playerPosition(0, 0, 20.0f);
-	player_->Initialize(model_, texture_,playerPosition);
+	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(),modelBullet_.get());
 	 
 	//LoadEnemyPopData();
 	 

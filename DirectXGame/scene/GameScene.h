@@ -113,6 +113,14 @@ private: // メンバ変数
 	Model* modelSkydome_ = nullptr;
 	Model* modelGround_ = nullptr;
 
+	// パーツ
+	std::unique_ptr<Model> modelFighterHead_;
+	std::unique_ptr<Model> modelFighterBody_;
+	std::unique_ptr<Model> modelFighterL_arm_;
+	std::unique_ptr<Model> modelFighterR_arm_;
+	// 自弾
+	std::unique_ptr<Model> modelBullet_;
+
 	//待機中フラグ
 	bool isWaiting = true;
 

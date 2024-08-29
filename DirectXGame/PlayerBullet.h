@@ -42,8 +42,6 @@ private:
 
 	// モデル
 	Model* model_ = nullptr;
-	// テクスチャハンドル
-	uint32_t sample_ = 0u;
 
 	//速度
 	Vector3 velocity_ = {0, 0, 0};

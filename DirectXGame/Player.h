@@ -16,7 +16,7 @@ class Player :public Collider
 public:
 	~Player();
 
-	void Initialize(Model* model, uint32_t font,Vector3 position);
+	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet);
 
 	void Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys);
 
@@ -28,11 +28,17 @@ public:
 	// 旋回
 	void Turn();
 
+	// 浮遊ギミック初期化
+	void InitializeFloatingGimick();
+
+	// 浮遊ギミック更新
+	void UpdateFloatingGimick();
+
 	// カメラのセット
 	void SetViewProjection(const ViewProjection* viewProjection) { viewProjection_ = viewProjection; }
 
 	// ワールド変換データの取得
-	WorldTransform& GetWorldTransform() { return worldTransformBlock; }
+	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 	void Attack();
 
@@ -72,12 +78,22 @@ public:
 
 private:
 	// ワールド変換データ
-	WorldTransform worldTransformBlock;
+	WorldTransform worldTransform_;
+	WorldTransform worldTransformBody_;
+	WorldTransform worldTransformHead_;
+	WorldTransform worldTransformL_arm_;
+	WorldTransform worldTransformR_arm_;
 
 	// モデル
-	Model* model_ = nullptr;
+	Model* modelHead_ = nullptr;
+	Model* modelBody_ = nullptr;
+	Model* modelL_arm_ = nullptr;
+	Model* modelR_arm_ = nullptr;
+	// 弾
+	Model* modelBullet_ = nullptr;
+	
 	// テクスチャハンドル
-	uint32_t font_ = 0u;
+	//uint32_t font_ = 0u;
 
 	// キーボード入力
 	Input* input_ = nullptr;
@@ -126,6 +142,13 @@ private:
 	Vector3 velocity_ = {};
 	// 速さ
 	float speed = 0.5f;
+
+	// 浮遊ギミックの媒介変数
+	float floatingParameter_;
+	// 浮遊の振幅<m>
+	float floatingAmplitude_;
+	// 浮遊移動のサイクル
+	uint16_t floatingCycle_;
 
 	//////////////////////////////////////////////////////
 	float jamp = 90.0f;

@@ -62,7 +62,7 @@ void GameScene::Initialize() {
 	//LoadEnemyPopData();
 	 
 
-	 // 3Dモデルの生成
+	 // 3Dモデルの生成 
 	 modelSkydome_ = Model::CreateFromOBJ("skydome", true);
  	 modelGround_ = Model::CreateFromOBJ("ground", true);
 

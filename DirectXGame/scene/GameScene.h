@@ -11,7 +11,8 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Skydome.h"
-#include "RailCamera.h"
+//#include "RailCamera.h"
+#include "FollowCamera.h"
 #include "CollisionManager.h"
 #include "Ground.h"
 #include <sstream>
@@ -96,7 +97,8 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	ViewProjection viewProjection_;
 	Skydome* skydome_ = nullptr;
-	RailCamera* railCamera_ = nullptr;
+	//RailCamera* railCamera_ = nullptr;
+	FollowCamera* followCamera_ = nullptr;
 	Ground* ground_ = nullptr;
 
 	// 敵弾

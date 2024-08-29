@@ -20,7 +20,19 @@ public:
 
 	void Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys);
 
-	void Draw(ViewProjection& viewProjection);
+	void Draw();
+
+	// 移動
+	void Move();
+
+	// 旋回
+	void Turn();
+
+	// カメラのセット
+	void SetViewProjection(const ViewProjection* viewProjection) { viewProjection_ = viewProjection; }
+
+	// ワールド変換データの取得
+	WorldTransform& GetWorldTransform() { return worldTransformBlock; }
 
 	void Attack();
 
@@ -98,7 +110,7 @@ private:
 	Vector2 spritePos_;
 	Vector3 positionReticle_ = {0, 0, 0};
 
-	ViewProjection viewProjection_;
+	const ViewProjection* viewProjection_ = nullptr;
 
 	std::list<Enemy*> enemys_;
 
@@ -110,7 +122,12 @@ private:
 	float length = 100.0f;
 	float reticleRadius_ = 35.0f;
 
+	// 速度
+	Vector3 velocity_ = {};
+	// 速さ
+	float speed = 0.5f;
 
+	//////////////////////////////////////////////////////
 	float jamp = 90.0f;
 	float jampTime = 20.0f;
 	bool isJ = false;

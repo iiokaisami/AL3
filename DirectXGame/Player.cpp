@@ -5,6 +5,7 @@
 #include "WinApp.h"
 #include "Enemy.h"
 
+
 Player::~Player() {
 	delete calculationMath_;
 
@@ -49,8 +50,6 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 	// スプライト生成
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 
-	viewProjection_.Initialize();
-
 	SetCollisionAttribute(0b1);
 
 	SetCollisionMask(0b1 << 1);
@@ -89,6 +88,10 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 
 		worldTransformBlock.rotation_.y -= kRotSpeed;
 	}*/
+
+	Move();
+
+	Turn();
 
 	// 押した方向で移動ベクトルを変更（左右）
 	if (input_->PushKey(DIK_A)) {
@@ -143,18 +146,18 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	}
 
 
-	// 移動限界座標
-	const float kMoveLimitX = 10;
-	const float kMoveLimitY = 6;
+	//// 移動限界座標
+	//const float kMoveLimitX = 10;
+	//const float kMoveLimitY = 6;
 
-	// 範囲を超えない処理
-	worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
-	worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
-	worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
-	worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
+	//// 範囲を超えない処理
+	//worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
+	//worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
+	//worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
+	//worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
 
 	// 座標移動（ベクトルの加算）
-	worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
+	//worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
 
 
 	// ビューポート行列
@@ -246,16 +249,55 @@ void Player::Attack() {
 	}
 };
 
-void Player::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransformBlock, viewProjection, font_);
+void Player::Draw() {
+	model_->Draw(worldTransformBlock, *viewProjection_, font_);
 
 	// 弾描画
 	for (PlayerBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
+		bullet->Draw(*viewProjection_);
 	}
 
 	//3Dレティクルを描画
-	model_->Draw(worldTransform3DReticle_, viewProjection);
+	//model_->Draw(worldTransform3DReticle_, *viewProjection_);
+}
+
+void Player::Move() {
+	XINPUT_STATE joyState;
+
+	// コントローラが接続されているのなら
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+
+		// 移動量
+		velocity_ = {(float)joyState.Gamepad.sThumbLX, 0.0f, (float)joyState.Gamepad.sThumbLY};
+
+		// 移動量に速さを反映
+		// 0除算にならないようにする
+		if (calculationMath_->Length(velocity_) > 0.0f) {
+			velocity_ = calculationMath_->Multiply(speed, calculationMath_->Normalize(velocity_));
+		}
+
+		// 移動ベクトルをカメラの角度だけ回転させる
+		velocity_ = calculationMath_->Transform(velocity_, calculationMath_->MakeRotateYMatrix(viewProjection_->rotation_.y)); 
+
+		// 移動
+		//calculationMath_->Add(worldTransformBlock.translation_, move_);
+		worldTransformBlock.translation_.x += velocity_.x;
+		worldTransformBlock.translation_.z += velocity_.z;
+
+	}
+
+	// 行列の計算
+	worldTransformBlock.UpdateMatrix();
+}
+
+void Player::Turn(){
+	//Y軸周り角度(0ｙ)
+	worldTransformBlock.rotation_.y = std::atan2(velocity.x, velocity.z);
+	float velocityX = calculationMath_->Length({velocity.x, 0.0f, 0.0f});
+	// X軸周り角度(0x)
+	worldTransformBlock.rotation_.x = std::atan2(0.0f, velocityX);
+
+	worldTransformBlock.UpdateMatrix();
 };
 
 Vector3 Player::GetWorldPosition(){

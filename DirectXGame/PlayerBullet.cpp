@@ -47,10 +47,10 @@ void PlayerBullet::Update() {
 		isDead_ = true;
 	}
 
-	if (input_->TriggerKey(DIK_RETURN))
+	/*if (input_->TriggerKey(DIK_RETURN))
 	{
 		isDead_ = true;
-	}
+	}*/
 }
 
 void PlayerBullet::Draw(const ViewProjection& viewProjection) { 

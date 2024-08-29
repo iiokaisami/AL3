@@ -13,7 +13,8 @@ GameScene::~GameScene() {
 	delete model_;
 	delete skydome_;
 	delete modelSkydome_;
-	delete railCamera_;
+	//delete railCamera_;
+	delete followCamera_;
 	delete ground_;
 	delete modelGround_;
 	delete colliderManager_;
@@ -57,7 +58,6 @@ void GameScene::Initialize() {
 	//自キャラの初期化
 	Vector3 playerPosition(0, 0, 20.0f);
 	player_->Initialize(model_, texture_,playerPosition);
-
 	 
 	//LoadEnemyPopData();
 	 
@@ -72,14 +72,22 @@ void GameScene::Initialize() {
 	 ground_ = new Ground;
 	 ground_->Initialize(modelGround_);
 
-	 railCamera_ = new RailCamera;
-	 railCamera_->Initialize({0, 0, 0}, {0, 0, 0},viewProjection_);
+	 //railCamera_ = new RailCamera;
+	 //railCamera_->Initialize({0, 0, 0}, {0, 0, 0},viewProjection_);
+	 followCamera_ = new FollowCamera;
+	 followCamera_->Initialize();
 
 	 enemy123 = new Enemy123();
 	 enemy123->Initialize(model_, {0, 10.0f, 40.0f});
 
 	 //自キャラとレールカメラの親子関係を結ぶ
-	 player_->SetParent(&railCamera_->GetWorldTransform());
+	 //player_->SetParent(&railCamera_->GetWorldTransform());
+	 //  自キャラのワールドトランスフォームを追従カメラにセット
+	 followCamera_->SetTarget(&player_->GetWorldTransform());
+
+	 //向いている方向を合わせる
+	 player_->SetViewProjection(&followCamera_->GetViewProjection());
+
 
 	 //レティクルのテクスチャ
 	 TextureManager::Load("reticle.png");
@@ -112,10 +120,16 @@ void GameScene::Update() {
 	//ビュープロジェクション行列の更新と転送
 		viewProjection_.UpdateMatrix();
 
-		railCamera_->Update();
+		//railCamera_->Update();
 
-		viewProjection_.matView = railCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+		//viewProjection_.matView = railCamera_->GetViewProjection().matView;
+		//viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+		//  追従カメラ
+		followCamera_->Update();
+
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+
 		viewProjection_.TransferMatrix();
 	}
 
@@ -218,7 +232,7 @@ void GameScene::Draw() {
 	/// </summary>
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
-	player_->Draw(viewProjection_);
+	player_->Draw();
 
 	
 	// 敵描画
@@ -248,7 +262,7 @@ void GameScene::Draw() {
 
 	player_->DrawUI(viewProjection_);
 	
-	railCamera_->Draw();
+	//railCamera_->Draw();
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる

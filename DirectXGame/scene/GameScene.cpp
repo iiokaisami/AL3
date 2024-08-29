@@ -42,7 +42,7 @@ void GameScene::Initialize() {
 	// ビュープロジェクションの初期化
 	viewProjection_.farZ = 800;
 	viewProjection_.Initialize();
-
+	 
 
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);

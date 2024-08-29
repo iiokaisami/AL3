@@ -18,7 +18,7 @@ void Ground::Initialize(Model* model) {
 void Ground::Update() { 
 	worldTransform_.UpdateMatrix();
 }
-
+　
 void Ground::Draw(const ViewProjection& viewProjection) {
 	// 3Dモデル描画
 	model_->Draw(worldTransform_, viewProjection);

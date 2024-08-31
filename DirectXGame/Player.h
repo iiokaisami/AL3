@@ -8,6 +8,7 @@
 #include <list>
 #include "Sprite.h"
 #include "Collider.h"
+#include "BasePlayerState.h"
 
 class Enemy;
 
@@ -41,6 +42,13 @@ public:
 	WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 	void Attack();
+	bool GetIsAttack() const { return isAttack_; }
+	void AttackMotion();
+	void SetAttackParameter(float attackParameter, uint16_t attackCycle);
+
+	void Jump();
+	bool GetIsJump() const { return isJump_; }
+	void SetJumpParameter();
 
 	// ワールド座標を取得
 	Vector3 GetWorldPosition() override;
@@ -52,6 +60,11 @@ public:
 
 	//弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
+
+	// StatePattern
+	void ChangeState(std::unique_ptr<BasePlayerState> state);
+
+	void UpdateMatrix();
 
 	//半径
 	float GetRadius() { return radius_; }
@@ -107,8 +120,17 @@ private:
 
 	Vector3 rockOnVelocity{0, 0, kBulletSpeed};
 
+	std::unique_ptr<BasePlayerState> state_;
+
 	// 弾
 	std::list<PlayerBullet*> bullets_;
+
+	bool isAttack_ = false;
+
+	// 攻撃ギミックの媒介変数
+	float attackParameter_;
+	// 攻撃モーション
+	uint16_t attackCycle_;
 
 	//半径
 	float radius_ = 0;
@@ -138,10 +160,20 @@ private:
 	float length = 100.0f;
 	float reticleRadius_ = 35.0f;
 
+	// キャラクターの移動ベクトル
+	Vector3 move = {0, 0, 0};
+	// キャラクターの移動速さ
+	const float kCharacterSpeed = 0.2f;
+
 	// 速度
 	Vector3 velocity_ = {};
 	// 速さ
 	float speed = 0.5f;
+
+	// ジャンプ初速
+	const float kJumpFirstSpeed = 1.0f;
+
+	bool isJump_ = false;
 
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_;
@@ -149,9 +181,4 @@ private:
 	float floatingAmplitude_;
 	// 浮遊移動のサイクル
 	uint16_t floatingCycle_;
-
-	//////////////////////////////////////////////////////
-	float jamp = 90.0f;
-	float jampTime = 20.0f;
-	bool isJ = false;
 };

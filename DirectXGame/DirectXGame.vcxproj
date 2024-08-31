@@ -107,12 +107,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="2d\ImGuiManager.cpp" />
+    <ClCompile Include="BaseCharacter.cpp" />
     <ClCompile Include="BaseEnemyState.cpp" />
+    <ClCompile Include="BasePlayerState.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
     <ClCompile Include="CalculationMath.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
+    <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Enemy2.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
@@ -124,7 +127,9 @@
     <ClCompile Include="Operator.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
-    <ClCompile Include="RailCamera.cpp" />
+    <ClCompile Include="PlayerStateAttack.cpp" />
+    <ClCompile Include="PlayerStateJump.cpp" />
+    <ClCompile Include="PlayerStateRoot.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="TimeCall.cpp" />
@@ -150,7 +155,9 @@
     <ClInclude Include="3d\ViewProjection.h" />
     <ClInclude Include="3d\WorldTransform.h" />
     <ClInclude Include="audio\Audio.h" />
+    <ClInclude Include="BaseCharacter.h" />
     <ClInclude Include="BaseEnemyState.h" />
+    <ClInclude Include="BasePlayerState.h" />
     <ClInclude Include="base\DirectXCommon.h" />
     <ClInclude Include="base\StringUtility.h" />
     <ClInclude Include="base\TextureManager.h" />
@@ -158,6 +165,7 @@
     <ClInclude Include="CalculationMath.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionManager.h" />
+    <ClInclude Include="Easing.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Enemy2.h" />
     <ClInclude Include="EnemyBullet.h" />
@@ -173,7 +181,9 @@
     <ClInclude Include="Operator.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
-    <ClInclude Include="RailCamera.h" />
+    <ClInclude Include="PlayerStateAttack.h" />
+    <ClInclude Include="PlayerStateJump.h" />
+    <ClInclude Include="PlayerStateRoot.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="TimeCall.h" />

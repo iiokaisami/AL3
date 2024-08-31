@@ -28,6 +28,9 @@ public:
 	// ワールド座標を取得
 	Vector3 GetWorldPosition() override;
 
+	// ワールド変換データの取得
+	void SetWorldRotation(Vector3 num) { worldTransform_.rotation_ = num; }
+
 	// 半径
 	float GetRadius() { return radius_; }
 

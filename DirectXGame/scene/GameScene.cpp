@@ -13,7 +13,6 @@ GameScene::~GameScene() {
 	delete model_;
 	delete skydome_;
 	delete modelSkydome_;
-	//delete railCamera_;
 	delete followCamera_;
 	delete ground_;
 	delete modelGround_;
@@ -81,16 +80,13 @@ void GameScene::Initialize() {
 	 ground_ = new Ground;
 	 ground_->Initialize(modelGround_);
 
-	 //railCamera_ = new RailCamera;
-	 //railCamera_->Initialize({0, 0, 0}, {0, 0, 0},viewProjection_);
 	 followCamera_ = new FollowCamera;
 	 followCamera_->Initialize();
 
 	 enemy123 = new Enemy123();
 	 enemy123->Initialize(model_, {0, 10.0f, 40.0f});
 
-	 //自キャラとレールカメラの親子関係を結ぶ
-	 //player_->SetParent(&railCamera_->GetWorldTransform());
+
 	 //  自キャラのワールドトランスフォームを追従カメラにセット
 	 followCamera_->SetTarget(&player_->GetWorldTransform());
 
@@ -129,10 +125,6 @@ void GameScene::Update() {
 	//ビュープロジェクション行列の更新と転送
 		viewProjection_.UpdateMatrix();
 
-		//railCamera_->Update();
-
-		//viewProjection_.matView = railCamera_->GetViewProjection().matView;
-		//viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 		//  追従カメラ
 		followCamera_->Update();
 
@@ -271,8 +263,7 @@ void GameScene::Draw() {
 
 	player_->DrawUI(viewProjection_);
 	
-	//railCamera_->Draw();
-
+	
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>

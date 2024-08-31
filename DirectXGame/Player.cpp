@@ -6,6 +6,11 @@
 #include "Enemy.h"
 #include <cmath>
 #include <numbers>
+#include "PlayerStateAttack.h"
+#include "PlayerStateRoot.h"
+#include "PlayerStateJump.h"
+#include "Easing.h"
+
 
 Player::~Player() {
 	delete calculationMath_;
@@ -19,8 +24,6 @@ Player::~Player() {
 	for (Sprite* sprite2DReticle : lockOnSprite2DReticle_) {
 		delete sprite2DReticle;
 	}
-
-
 }
 
 void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm,Model* modelBullet) {
@@ -46,7 +49,6 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	worldTransform_.Initialize();
 	
 	worldTransformBody_.Initialize();
-	//worldTransformBody_.translation_ = {0.0f, 4.0f, 0.0f};
 
 	worldTransformHead_.Initialize();
 	worldTransformHead_.translation_ = {0.0f, 1.5f, 0.0f};
@@ -64,6 +66,7 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	worldTransformL_arm_.parent_ = &worldTransformBody_;
 	worldTransformR_arm_.parent_ = &worldTransformBody_;
 
+	ChangeState(std::make_unique<PlayerStateRoot>(this));
 
 	InitializeFloatingGimick();
 
@@ -93,17 +96,9 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
 
-	UpdateFloatingGimick();
-
 	worldTransform_.UpdateMatrix();
 
-	// キャラクターの移動ベクトル
-	Vector3 move = {0, 0, 0};
-
-	// キャラクターの移動速さ
-	const float kCharacterSpeed = 0.2f;
-
-	//デスフラグの立った弾を削除
+	// デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
 			delete bullet;
@@ -112,93 +107,18 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 		return false;
 	});
 
-	// 回転速さ[ラジアン/frame]
-	/* const float kRotSpeed = 0.02f;
-
-	// 押した方向で移動ベクトルを変更
-	if (input_->PushKey(DIK_A)) {
-
-		worldTransformBlock.rotation_.y += kRotSpeed;
-
-	} else if (input_->PushKey(DIK_D)) {
-
-		worldTransformBlock.rotation_.y -= kRotSpeed;
-	}*/
-
-	Move();
-
-	Turn();
-
-	// 押した方向で移動ベクトルを変更（左右）
-	if (input_->PushKey(DIK_A)) {
-
-		move.x -= kCharacterSpeed;
-
-	} else if (input_->PushKey(DIK_D)) {
-		
-		move.x += kCharacterSpeed;
-	}
-
-	// 押した方向で移動ベクトルを変更（上下）
-	if (input_->PushKey(DIK_S)) {
-
-		move.z -= kCharacterSpeed;
-	
-	} else if (input_->PushKey(DIK_W)) {
-
-		move.z += kCharacterSpeed;
-	}
-
-
-	if (input_->PushKey(DIK_SPACE) && !isJ){
-		jamp = jampTime;
-		isJ = true;
-	}
-
-	if (isJ) {
-		jamp -= 1.0f;
-
-		if (jamp <= 20.0f && jamp >= 10.0f) {
-			worldTransform_.translation_.y += 0.3f;
-		}
-
-		if (jamp < 10.0f && jamp >= 0.0f) {
-			worldTransform_.translation_.y -= 0.3f;
-		}
-
-		if (jamp < 0)
-		{
-			isJ = false;
-		}
-	}
-
 	// ゲームパッドの状態を得る変数（XINPUT）
 	XINPUT_STATE joyState;
-
 	// ゲームパッド状態取得
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed;
 		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;
 	}
 
-
-	//// 移動限界座標
-	//const float kMoveLimitX = 10;
-	//const float kMoveLimitY = 6;
-
-	//// 範囲を超えない処理
-	//worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
-	//worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
-	//worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
-	//worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
-
-	// 座標移動（ベクトルの加算）
-	//worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
-
-
 	// ビューポート行列
 	Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
-	
+
+	state_->Update();
 
 	MouseReticle(matViewPort, viewProjection);
 
@@ -208,9 +128,6 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	//IsRockon(enemys, viewProjection);
 	enemys;
 
-	/////// キャラクターの攻撃////////
-	Attack();
-
 	// 弾更新
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
@@ -218,46 +135,6 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 };
 
 void Player::Attack() {
-	if (input_->TriggerKey(DIK_LSHIFT)) {
-
-		// 速度ベクトルを自機の向きに合わせて回転させる
-		velocity = calculationMath_->TransformNormal(velocity, worldTransform_.matWorld_);
-
-		// 自機から標準オブジェクトへのベクトル
-		//velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
-		//velocity = calculationMath_->Multiply(kBulletSpeed, calculationMath_->Normalize(velocity));
-		if (!isRockon) {
-			velocity = GetWorld3DReticlePosition() - GetWorldPosition();
-
-			velocity = calculationMath_->Normalize(velocity) * kBulletSpeed;
-
-		    // 弾を生成し、初期化
-			PlayerBullet* newBullet = new PlayerBullet();
-			newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
-
-			// 弾を登録する
-			bullets_.push_back(newBullet);
-
-		} else {
-			for (Enemy* lockEnemy : lockOnEnemys_) {
-				if (lockEnemy->isDeath() == false) {
-					velocity = lockEnemy->GetWorldPosition() - GetWorldPosition();
-					velocity = calculationMath_->Normalize(velocity) * kBulletSpeed;
-
-					// 弾を生成し、初期化
-					PlayerBullet* newBullet = new PlayerBullet();
-					newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
-
-					// 弾を登録する
-					bullets_.push_back(newBullet);
-
-				}
-			}
-			lockOnEnemys_.clear();
-		}
-
-		
-	}
 
 	XINPUT_STATE joyState;
 
@@ -272,6 +149,7 @@ void Player::Attack() {
 		// 自機から標準オブジェクトへのベクトル
 		velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
 		velocity = calculationMath_->Multiply(kBulletSpeed, calculationMath_->Normalize(velocity));
+
 		if (isRockon) {
 			velocity = rockOnVelocity;
 		}
@@ -280,10 +158,46 @@ void Player::Attack() {
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
 
+		//// Y軸周り角度(θy)
+		//Vector3 num = {0, 0, 0};
+		//num.y = std::atan2(velocity_.x, velocity_.z);
+
+		//worldTransform_.rotation_ = num;
+		//newBullet->SetWorldRotation(num);
+
 		// 弾を登録する
 		bullets_.push_back(newBullet);
+
+		isAttack_ = true;
 	}
-};
+}
+
+void Player::AttackMotion(){
+
+	if (attackParameter_ < 1) {
+		// １フレーム分
+		float step = 1.0f / attackCycle_;
+
+		// フレームを加算
+		attackParameter_ += step;
+
+		// 腕の角度の始点と終点
+		float armOriginRotation = std::numbers::pi_v<float>;                           
+		float armEndRotation = abs(armOriginRotation - std::numbers::pi_v<float> / 2); 
+
+		// 腕の回転
+		worldTransformL_arm_.rotation_.x = armOriginRotation + EaseInQuint<float>(attackParameter_) * armEndRotation;
+		worldTransformR_arm_.rotation_.x = armOriginRotation + EaseInQuint<float>(attackParameter_) * armEndRotation;
+
+	} else {
+		isAttack_ = false;
+	}
+}
+
+void Player::SetAttackParameter(float attackParameter, uint16_t attackCycle) {
+	attackParameter_ = attackParameter;
+	attackCycle_ = attackCycle;
+}
 
 void Player::Draw() {
 	modelBody_->Draw(worldTransformBody_, *viewProjection_);
@@ -380,7 +294,48 @@ void Player::UpdateFloatingGimick() {
 	worldTransformR_arm_.UpdateMatrix();
 }
 
-Vector3 Player::GetWorldPosition(){
+void Player::Jump() {
+
+	// 移動
+	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, velocity_);
+	// 重力加速度
+	const float kGravityAcceleration = -0.05f;
+	// 加速度ベクトル
+	Vector3 accelerationVector = {0.0f, kGravityAcceleration, 0.0f};
+	// 加速する
+	velocity_ = calculationMath_->Add(velocity_, accelerationVector);
+
+	// 着地
+	if (worldTransform_.translation_.y <= 0.0f) {
+		worldTransform_.translation_.y = 0.0f;
+
+		isJump_ = false;
+	}
+
+	UpdateMatrix();
+}
+
+void Player::SetJumpParameter() {
+
+	XINPUT_STATE joyState;
+
+	// ゲームパッド未接続なら何もせずに抜ける
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+		return;
+	}
+
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) {
+		worldTransformBody_.translation_.y = 1.0f;
+		worldTransformL_arm_.rotation_.x = 0.0f;
+		worldTransformR_arm_.rotation_.x = 0.0f;
+
+		velocity_.y = kJumpFirstSpeed;
+
+		isJump_ = true;
+	}
+}
+
+Vector3 Player::GetWorldPosition() {
 	//ワールド座標を入れる変数
 	Vector3 worldPos;
 
@@ -402,6 +357,18 @@ Vector3 Player::GetWorld3DReticlePosition() {
 
 void Player::OnCollision() {
 	// 何もしない
+}
+
+void Player::ChangeState(std::unique_ptr<BasePlayerState> state) {
+	state_ = std::move(state);
+}
+
+void Player::UpdateMatrix() {
+	worldTransform_.UpdateMatrix();
+	worldTransformBody_.UpdateMatrix();
+	worldTransformHead_.UpdateMatrix();
+	worldTransformL_arm_.UpdateMatrix();
+	worldTransformR_arm_.UpdateMatrix();
 }
 
 void Player::SetParent(const WorldTransform* parent) { 
@@ -521,6 +488,11 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 ImGui::Text("Near:(%+.2f,%+.2f,%+.2f)", cPosNear.x, cPosNear.y, cPosNear.z);
 	 ImGui::Text("Far:(%+.2f,%+.2f,%+.2f)", cPosFar.x, cPosFar.y, cPosFar.z);
 	 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
+
+	 ImGui::Checkbox("Jump", &isJump_);
+	 if (isJump_) {
+		 Jump();
+	 }
 
 	 ImGui::End();
 

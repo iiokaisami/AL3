@@ -11,7 +11,6 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Skydome.h"
-//#include "RailCamera.h"
 #include "FollowCamera.h"
 #include "CollisionManager.h"
 #include "Ground.h"

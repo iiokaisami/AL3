@@ -17,7 +17,7 @@
 #include <sstream>
 #include <memory>
 
-#include "Enemy2.h"
+#include "BaseSceneState.h"
 
 /// <summary>
 /// ゲームシーン
@@ -45,10 +45,25 @@ public: // メンバ関数
 	/// </summary>
 	void Update();
 
+	// それぞれの処理
+	void UpdateTitle();
+	void UpdatePlay();
+	void UpdateClear();
+	void UpdateGameOver();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	// それぞれの描画
+	void DrawTitle();
+	void DrawTitle2D();
+	void DrawPlay();
+	void DrawPlay2D();
+	void DrawClear();
+	void DrawGameOver();
+
 
 	void AddEnemyBullet(EnemyBullet* enemyBullet);
 
@@ -58,12 +73,12 @@ public: // メンバ関数
 	void AddEnemy(Vector3 position);
 	
 	// 敵リストを取得
-	//const std::list<Enemy*>& GetEnemy() const { return enemys_; }
+	const std::list<Enemy*>& GetEnemy() const { return enemys_; }
 
 	//敵発生コマンド
-	//std::stringstream enemyPopCommands;
+	std::stringstream enemyPopCommands;
 
-	/*
+	
     /// <summary>
     /// 敵発生データの読み込み
     /// </summary>
@@ -73,7 +88,16 @@ public: // メンバ関数
     /// 敵発生のコマンド更新
     /// </summary>
 	void UpdateEnemyPopCommands();
-	*/
+	
+	// StatePattern
+	void ChangeState(std::unique_ptr<BaseSceneState> state);
+
+	// 画面切り替え条件
+	bool TitleToPlay();
+	bool PlayToClear();
+	bool PlayToGameOver();
+    bool ToTitle();
+
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -104,10 +128,8 @@ private: // メンバ変数
 	std::list<EnemyBullet*> enemyBullets_;
 
 	//敵
-	//std::list<Enemy*> enemys_;
-	Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemys_;
 
-	Enemy123* enemy123 = nullptr;
 
 	//3Dモデル
 	Model* modelSkydome_ = nullptr;
@@ -130,4 +152,6 @@ private: // メンバ変数
 	CollisionManager* colliderManager_ = nullptr;
 
 	CalculationMath* calculationMath_ = nullptr;
+
+	std::unique_ptr<BaseSceneState> state_;
 };

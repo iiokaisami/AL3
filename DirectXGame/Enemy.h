@@ -106,6 +106,11 @@ private:
 	//デスフラグ
 	bool isDeath_ = false;
 
+	// HP
+	int hitPoint_ = 10;
+
+	const uint32_t damage_ = 1;
+
 	// 弾速度
 	Vector3 velocity_ = {0, 0, 0};
 

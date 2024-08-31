@@ -110,6 +110,7 @@
     <ClCompile Include="BaseCharacter.cpp" />
     <ClCompile Include="BaseEnemyState.cpp" />
     <ClCompile Include="BasePlayerState.cpp" />
+    <ClCompile Include="BaseSceneState.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
     <ClCompile Include="CalculationMath.cpp" />
@@ -117,7 +118,6 @@
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Enemy2.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
     <ClCompile Include="EnemyStateApproach.cpp" />
     <ClCompile Include="EnemyStateLeave.cpp" />
@@ -130,6 +130,8 @@
     <ClCompile Include="PlayerStateAttack.cpp" />
     <ClCompile Include="PlayerStateJump.cpp" />
     <ClCompile Include="PlayerStateRoot.cpp" />
+    <ClCompile Include="SceneStatePlay.cpp" />
+    <ClCompile Include="SceneStateTitle.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="TimeCall.cpp" />
@@ -158,6 +160,7 @@
     <ClInclude Include="BaseCharacter.h" />
     <ClInclude Include="BaseEnemyState.h" />
     <ClInclude Include="BasePlayerState.h" />
+    <ClInclude Include="BaseSceneState.h" />
     <ClInclude Include="base\DirectXCommon.h" />
     <ClInclude Include="base\StringUtility.h" />
     <ClInclude Include="base\TextureManager.h" />
@@ -167,7 +170,6 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Enemy2.h" />
     <ClInclude Include="EnemyBullet.h" />
     <ClInclude Include="EnemyStateApproach.h" />
     <ClInclude Include="EnemyStateLeave.h" />
@@ -184,6 +186,8 @@
     <ClInclude Include="PlayerStateAttack.h" />
     <ClInclude Include="PlayerStateJump.h" />
     <ClInclude Include="PlayerStateRoot.h" />
+    <ClInclude Include="SceneStatePlay.h" />
+    <ClInclude Include="SceneStateTitle.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="TimeCall.h" />

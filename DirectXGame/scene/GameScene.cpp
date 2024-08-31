@@ -5,6 +5,9 @@
 #include <fstream>
 #include "ImGuiManager.h"
 
+#include "PlayerStateRoot.h"
+#include "SceneStateTitle.h"
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() { 
@@ -19,15 +22,13 @@ GameScene::~GameScene() {
 	delete colliderManager_;
 	delete calculationMath_; 
 
-	//for (Enemy* enemy : enemys_) {
-		delete enemy_;
-	//}
+	for (Enemy* enemy : enemys_) {
+		delete enemy;
+	}
 
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
 	}
-
-	delete enemy123;
 }
 
 void GameScene::Initialize() {
@@ -67,7 +68,7 @@ void GameScene::Initialize() {
 	Vector3 playerPosition(0, 0, 20.0f);
 	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(),modelBullet_.get());
 	 
-	//LoadEnemyPopData();
+	LoadEnemyPopData();
 	 
 
 	 // 3Dモデルの生成 
@@ -83,10 +84,9 @@ void GameScene::Initialize() {
 	 followCamera_ = new FollowCamera;
 	 followCamera_->Initialize();
 
-	 enemy123 = new Enemy123();
-	 enemy123->Initialize(model_, {0, 10.0f, 40.0f});
 
-	 AddEnemy({0,10.0f,40.0f});
+	 ChangeState(std::make_unique<SceneStateTitle>(this));
+
 
 	 //  自キャラのワールドトランスフォームを追従カメラにセット
 	 followCamera_->SetTarget(&player_->GetWorldTransform());
@@ -139,18 +139,18 @@ void GameScene::Update() {
 	
 
 	//自キャラの更新
-	player_->Update(viewProjection_, enemy_/*enemys_*/);
+	player_->Update(viewProjection_,enemys_);
 
-	//UpdateEnemyPopCommands();
+	UpdateEnemyPopCommands();
 
 	// デスフラグの立った敵を削除
-	//enemys_.remove_if([](Enemy* enemy) {
-		if (enemy_->isDeath()) {
-			delete enemy_;
-			//return true;
+	enemys_.remove_if([](Enemy* enemy) {
+		if (enemy->isDeath() == true) {
+			delete enemy;
+			return true;
 		}
-		//return false;
-	//});
+		return false;
+	});
 
 
 	// デスフラグの立った弾を削除
@@ -164,42 +164,41 @@ void GameScene::Update() {
 
 	
 	//敵更新
-	//for (Enemy* enemy : enemys_) {
+	for (Enemy* enemy : enemys_) {
 
-		if (enemy_) {
-			enemy_->Update();
+		if (enemy) {
+			enemy->Update();
 
-			if (enemy_->GetIsFire()) {
+			if (enemy->GetIsFire()) {
 
 				// 弾を生成し、初期化
 				EnemyBullet* newBullet = new EnemyBullet();
-				newBullet->Initialize(model_, enemy_->GetWorldPosition(), enemy_->GetVelocity());
+				newBullet->Initialize(model_, enemy->GetWorldPosition(), enemy->GetVelocity());
 				newBullet->SetPlayer(player_);
 
 				// 弾を登録する
-				AddEnemyBullet(newBullet);
+				//AddEnemyBullet(newBullet);
 
-				enemy_->SetIsFire(false);
+				enemy->SetIsFire(false);
 			}
 		}
-	//}
+	}
 
-	enemy123->Update();
 
-	player_->SetEnemy(enemy_ /*enemys_*/);
+	player_->SetEnemy(enemys_);
 
 	// 敵弾更新
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Update();
 	}
 
-
+	state_->Update();
 	
 	// 自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 
 	// コライダーをリストに登録
-	colliderManager_->UpData(player_, playerBullets, GetBullets(),enemy_/*GetEnemy()*/);
+	colliderManager_->UpData(player_, playerBullets, GetBullets(), GetEnemy());
 
 	ground_->Update();
 
@@ -234,24 +233,9 @@ void GameScene::Draw() {
 	/// </summary>
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
-	player_->Draw();
-
 	
-	// 敵描画
-	//for (Enemy* enemy : enemys_) {
-		if (enemy_) 
-		{
-			enemy_->Draw(viewProjection_);
-		}
-	//}
-	
-	//enemy123->Draw(viewProjection_);
 
-	// 弾描画
-	for (EnemyBullet* bullet : enemyBullets_) {
-		bullet->Draw(viewProjection_);
-	}
-
+	state_->Draw();
 	
 
 	// 3Dオブジェクト描画後処理
@@ -262,7 +246,7 @@ void GameScene::Draw() {
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
 
-	player_->DrawUI(viewProjection_);
+	state_->Draw2D();
 	
 	
 	/// <summary>
@@ -275,6 +259,42 @@ void GameScene::Draw() {
 #pragma endregion
 }
 
+void GameScene::DrawTitle() {
+
+}
+
+void GameScene::DrawTitle2D() {
+
+}
+
+void GameScene::DrawPlay() {
+	player_->Draw();
+
+	// 敵描画
+	for (Enemy* enemy : enemys_) {
+		if (enemy) {
+			enemy->Draw(viewProjection_);
+		}
+	}
+
+	// 弾描画
+	for (EnemyBullet* bullet : enemyBullets_) {
+		bullet->Draw(viewProjection_);
+	}
+}
+
+void GameScene::DrawPlay2D() { 
+	player_->DrawUI(viewProjection_); 
+}
+
+void GameScene::DrawClear() {
+
+}
+
+void GameScene::DrawGameOver() {
+
+}
+
 
 
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
@@ -284,18 +304,17 @@ void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 
 void GameScene::AddEnemy(Vector3 position) {
 	
-	//Enemy* enemy_ = new Enemy;
-	enemy_ = new Enemy;
-	enemy_->Initialize(model_, position);
+	Enemy* enemy = new Enemy;
+	enemy->Initialize(model_, position);
 
 	// 敵キャラにゲームシーンを渡す
-	enemy_->SetGameScene(this);
-	enemy_->SetPlayer(player_);
+	enemy->SetGameScene(this);
+	enemy->SetPlayer(player_);
 
 	//リストに登録
-	//enemys_.push_back(enemy);
+	enemys_.push_back(enemy);
 }
-/*
+
 void GameScene::LoadEnemyPopData() {
 
 	//ファイルを開く
@@ -379,4 +398,54 @@ void GameScene::UpdateEnemyPopCommands() {
 		}
 	}
 }
-*/
+
+void GameScene::ChangeState(std::unique_ptr<BaseSceneState> state) { 
+	state_ = std::move(state); }
+
+bool GameScene::TitleToPlay() {
+	XINPUT_STATE joyState;
+
+	// ゲームパッド未接続なら何もせずに抜ける
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+		return false;
+	}
+
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+		return true;
+	}
+	return false;
+}
+
+bool GameScene::PlayToClear() {
+	XINPUT_STATE joyState;
+
+	// ゲームパッド未接続なら何もせずに抜ける
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+		return false;
+	}
+	return false;
+}
+
+bool GameScene::PlayToGameOver() {
+	XINPUT_STATE joyState;
+
+	// ゲームパッド未接続なら何もせずに抜ける
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+		return false;
+	}
+	return false;
+}
+
+bool GameScene::ToTitle() {
+	XINPUT_STATE joyState;
+
+	// ゲームパッド未接続なら何もせずに抜ける
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+		return false;
+	}
+
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+		return true;
+	}
+	return false;
+}

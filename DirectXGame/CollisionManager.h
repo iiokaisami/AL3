@@ -19,12 +19,12 @@ public:
 	void UpData(Player* player, 
 		const std::list<PlayerBullet*>& playerBullets,
 		const std::list<EnemyBullet*>& enemyBullets,
-	    Enemy* enemy /*const std::list<Enemy*>& enemys*/);
+		const std::list<Enemy*>& enemys);
 
 	void RegistrationList(Player* player, 
 		const std::list<PlayerBullet*>& playerBullets,
 		const std::list<EnemyBullet*>& enemyBullets,
-	    Enemy* enemy /*const std::list<Enemy*>& enemys*/);
+		const std::list<Enemy*>& enemys);
 
 	void ClearList();
 

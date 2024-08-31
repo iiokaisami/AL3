@@ -94,7 +94,7 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	
 };
 
-void Player::Update(ViewProjection& viewProjection, Enemy* enemy /*const std::list<Enemy*>& enemys*/) {
+void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
 
 	worldTransform_.UpdateMatrix();
 
@@ -126,7 +126,7 @@ void Player::Update(ViewProjection& viewProjection, Enemy* enemy /*const std::li
 
 
 	//IsRockon(enemys, viewProjection);
-	enemy;
+	enemys;
 
 	// 弾更新
 	for (PlayerBullet* bullet : bullets_) {
@@ -543,10 +543,10 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
-bool Player::IsRockon(Enemy* enemy /* const std::list<Enemy*>& enemys*/, ViewProjection& viewProjection) {
+bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) {
 	Vector2 reticlePos = sprite2DReticle_->GetPosition();
 
-	//for (Enemy* enemy : enemys) {
+	for (Enemy* enemy : enemys) {
 		enemyPos = enemy->ChangeScreenPos(viewProjection);
 
 		length = calculationMath_->Length({reticlePos.x, reticlePos.y, 0}, enemyPos);
@@ -559,17 +559,17 @@ bool Player::IsRockon(Enemy* enemy /* const std::list<Enemy*>& enemys*/, ViewPro
 
 			return isRockon = true;
 		}
-	//}
+	}
 
 	return isRockon = false;
 }
 
 void Player::LockOnRemove() {
-	//lockOnEnemys_.remove_if([](Enemy* enemy) {
-		if (enemy_ == nullptr) {
-			delete enemy_;
-			//return true;
+	lockOnEnemys_.remove_if([](Enemy* enemy) {
+		if (enemy == nullptr) {
+			delete enemy;
+			return true;
 		}
-		//return false;
-	//});
+		return false;
+	});
 }

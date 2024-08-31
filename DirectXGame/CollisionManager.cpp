@@ -13,10 +13,10 @@ void CollisionManager::Initialize() {}
 void CollisionManager::UpData(Player* player,
 	const std::list<PlayerBullet*>& playerBullets,
 	const std::list<EnemyBullet*>& enemyBullets, 
-	Enemy* enemy /*const std::list<Enemy*>& enemys*/) { 
+	const std::list<Enemy*>& enemys) { 
 	
 	ClearList();
-	RegistrationList(player, playerBullets, enemyBullets,enemy /*enemys */);
+	RegistrationList(player,playerBullets,enemyBullets,enemys);
 	CheckAllCollisions();
 
 }
@@ -24,7 +24,7 @@ void CollisionManager::UpData(Player* player,
 void CollisionManager::RegistrationList(Player* player, 
 	const std::list<PlayerBullet*>& playerBullets, 
 	const std::list<EnemyBullet*>& enemyBullets, 
-	Enemy* enemy /*const std::list<Enemy*>& enemys*/) {
+	const std::list<Enemy*>& enemys) {
 
 	// コライダーをリストに登録
 	colliders_.push_back(player);
@@ -37,9 +37,9 @@ void CollisionManager::RegistrationList(Player* player,
 		colliders_.push_back(enemyBullet);
 	}
 	// 敵全てについて
-	//for (Enemy* enemy : enemys) {
+	for (Enemy* enemy : enemys) {
 		colliders_.push_back(enemy);
-	//}
+	}
 }
 
 void CollisionManager::ClearList() { 

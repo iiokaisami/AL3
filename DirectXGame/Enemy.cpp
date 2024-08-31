@@ -6,6 +6,9 @@
 #include "EnemyStateLeave.h"
 #include "WinApp.h"
 
+
+#include "ImGuiManager.h"
+
 Enemy::~Enemy() { 
 	delete calculationMath_;
 
@@ -29,7 +32,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 	calculationMath_ = new CalculationMath;
 
-	radius_ = 5.0f;
+	radius_ = 8.0f;
 
 	isDeath_ = false;
 
@@ -66,7 +69,10 @@ void Enemy::Update() {
 		SetFireTimer();
 	}
 
-	
+	if (hitPoint_ == 0)
+	{
+		isDeath_ = true;
+	}
 
 	state_->Update();
 
@@ -74,6 +80,12 @@ void Enemy::Update() {
 	worldTransform_.translation_ = calculationMath_->Add(worldTransform_.translation_, vel_);
 
 	worldTransform_.UpdateMatrix();
+
+	ImGui::Begin("Floating Model");
+
+	ImGui::DragInt("HP", &hitPoint_, 1);
+
+	ImGui::End();
 }
 
 void Enemy::Fire() {
@@ -110,7 +122,7 @@ Vector3 Enemy::GetWorldPosition() {
 }
 
 void Enemy::OnCollision(){ 
-	isDeath_ = true;
+	hitPoint_ -= damage_;
 }
 
 

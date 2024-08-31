@@ -19,9 +19,9 @@ GameScene::~GameScene() {
 	delete colliderManager_;
 	delete calculationMath_; 
 
-	for (Enemy* enemy : enemys_) {
-		delete enemy;
-	}
+	//for (Enemy* enemy : enemys_) {
+		delete enemy_;
+	//}
 
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
@@ -86,6 +86,7 @@ void GameScene::Initialize() {
 	 enemy123 = new Enemy123();
 	 enemy123->Initialize(model_, {0, 10.0f, 40.0f});
 
+	 AddEnemy({0,10.0f,40.0f});
 
 	 //  自キャラのワールドトランスフォームを追従カメラにセット
 	 followCamera_->SetTarget(&player_->GetWorldTransform());
@@ -138,18 +139,18 @@ void GameScene::Update() {
 	
 
 	//自キャラの更新
-	player_->Update(viewProjection_,enemys_);
+	player_->Update(viewProjection_, enemy_/*enemys_*/);
 
 	//UpdateEnemyPopCommands();
 
 	// デスフラグの立った敵を削除
-	enemys_.remove_if([](Enemy* enemy) {
-		if (enemy->isDeath() == true) {
-			delete enemy;
-			return true;
+	//enemys_.remove_if([](Enemy* enemy) {
+		if (enemy_->isDeath()) {
+			delete enemy_;
+			//return true;
 		}
-		return false;
-	});
+		//return false;
+	//});
 
 
 	// デスフラグの立った弾を削除
@@ -163,29 +164,29 @@ void GameScene::Update() {
 
 	
 	//敵更新
-	for (Enemy* enemy : enemys_) {
+	//for (Enemy* enemy : enemys_) {
 
-		if (enemy) {
-			enemy->Update();
+		if (enemy_) {
+			enemy_->Update();
 
-			if (enemy->GetIsFire()) {
+			if (enemy_->GetIsFire()) {
 
 				// 弾を生成し、初期化
 				EnemyBullet* newBullet = new EnemyBullet();
-				newBullet->Initialize(model_, enemy->GetWorldPosition(), enemy->GetVelocity());
+				newBullet->Initialize(model_, enemy_->GetWorldPosition(), enemy_->GetVelocity());
 				newBullet->SetPlayer(player_);
 
 				// 弾を登録する
-				//AddEnemyBullet(newBullet);
+				AddEnemyBullet(newBullet);
 
-				enemy->SetIsFire(false);
+				enemy_->SetIsFire(false);
 			}
 		}
-	}
+	//}
 
 	enemy123->Update();
 
-	player_->SetEnemy(enemys_);
+	player_->SetEnemy(enemy_ /*enemys_*/);
 
 	// 敵弾更新
 	for (EnemyBullet* bullet : enemyBullets_) {
@@ -198,7 +199,7 @@ void GameScene::Update() {
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 
 	// コライダーをリストに登録
-	colliderManager_->UpData(player_, playerBullets, GetBullets(), GetEnemy());
+	colliderManager_->UpData(player_, playerBullets, GetBullets(),enemy_/*GetEnemy()*/);
 
 	ground_->Update();
 
@@ -237,14 +238,14 @@ void GameScene::Draw() {
 
 	
 	// 敵描画
-	for (Enemy* enemy : enemys_) {
-		if (enemy) 
+	//for (Enemy* enemy : enemys_) {
+		if (enemy_) 
 		{
-			enemy->Draw(viewProjection_);
+			enemy_->Draw(viewProjection_);
 		}
-	}
+	//}
 	
-	enemy123->Draw(viewProjection_);
+	//enemy123->Draw(viewProjection_);
 
 	// 弾描画
 	for (EnemyBullet* bullet : enemyBullets_) {
@@ -275,7 +276,7 @@ void GameScene::Draw() {
 }
 
 
-/*
+
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	// リストに登録
 	enemyBullets_.push_back(enemyBullet);
@@ -283,17 +284,18 @@ void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 
 void GameScene::AddEnemy(Vector3 position) {
 	
-	Enemy* enemy = new Enemy;
-	enemy->Initialize(model_, position);
+	//Enemy* enemy_ = new Enemy;
+	enemy_ = new Enemy;
+	enemy_->Initialize(model_, position);
 
 	// 敵キャラにゲームシーンを渡す
-	enemy->SetGameScene(this);
-	enemy->SetPlayer(player_);
+	enemy_->SetGameScene(this);
+	enemy_->SetPlayer(player_);
 
 	//リストに登録
-	enemys_.push_back(enemy);
+	//enemys_.push_back(enemy);
 }
-
+/*
 void GameScene::LoadEnemyPopData() {
 
 	//ファイルを開く

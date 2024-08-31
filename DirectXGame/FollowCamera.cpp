@@ -56,5 +56,6 @@ void FollowCamera::Turn() {
 		const float rotationSpeed = 0.000001f;
 
 		viewProjection_.rotation_.y += (float)joyState.Gamepad.sThumbRX * rotationSpeed;
+		viewProjection_.rotation_.x -= (float)joyState.Gamepad.sThumbRY * rotationSpeed;
 	}
 }

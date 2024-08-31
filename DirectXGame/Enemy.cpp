@@ -22,14 +22,14 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 	kamata_ = TextureManager::Load("kamata.ico");
 
 	worldTransform_.Initialize();
-
 	worldTransform_.translation_ = position;
+	worldTransform_.scale_ = {5.0f, 5.0f, 2.0f};
 
 	vel_ = {0, 0, 0};
 
 	calculationMath_ = new CalculationMath;
 
-	radius_ = 2.0f;
+	radius_ = 5.0f;
 
 	isDeath_ = false;
 

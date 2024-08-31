@@ -50,18 +50,18 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
-	//void AddEnemyBullet(EnemyBullet* enemyBullet);
+	void AddEnemyBullet(EnemyBullet* enemyBullet);
 
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() const { return enemyBullets_; }
 
-	//void AddEnemy(Vector3 position);
+	void AddEnemy(Vector3 position);
 	
 	// 敵リストを取得
-	const std::list<Enemy*>& GetEnemy() const { return enemys_; }
+	//const std::list<Enemy*>& GetEnemy() const { return enemys_; }
 
 	//敵発生コマンド
-	std::stringstream enemyPopCommands;
+	//std::stringstream enemyPopCommands;
 
 	/*
     /// <summary>
@@ -104,7 +104,8 @@ private: // メンバ変数
 	std::list<EnemyBullet*> enemyBullets_;
 
 	//敵
-	std::list<Enemy*> enemys_;
+	//std::list<Enemy*> enemys_;
+	Enemy* enemy_ = nullptr;
 
 	Enemy123* enemy123 = nullptr;
 

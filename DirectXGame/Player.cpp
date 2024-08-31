@@ -94,7 +94,7 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	
 };
 
-void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
+void Player::Update(ViewProjection& viewProjection, Enemy* enemy /*const std::list<Enemy*>& enemys*/) {
 
 	worldTransform_.UpdateMatrix();
 
@@ -126,7 +126,7 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 
 
 	//IsRockon(enemys, viewProjection);
-	enemys;
+	enemy;
 
 	// 弾更新
 	for (PlayerBullet* bullet : bullets_) {
@@ -211,7 +211,7 @@ void Player::Draw() {
 	}
 
 	//3Dレティクルを描画
-	//model_->Draw(worldTransform3DReticle_, *viewProjection_);
+	modelBullet_->Draw(worldTransform3DReticle_, *viewProjection_);
 }
 
 void Player::Move() {
@@ -376,18 +376,26 @@ void Player::SetParent(const WorldTransform* parent) {
 }
 
 void Player::DrawUI(ViewProjection& viewProjection) {
-	sprite2DReticle_->Draw();
-	for (Enemy* enemy : lockOnEnemys_) {
-		if (enemy->isDeath() == false) {
-			Vector3 pos = enemy->GetWorldPosition();
-			Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
-			Matrix4x4 matVPV = calculationMath_->Multiply(viewProjection.matView, calculationMath_->Multiply(viewProjection.matProjection, matViewPort));
-
-			pos = calculationMath_->Transform(pos, matVPV);
-			Sprite* reticle = Sprite::Create(textureReticle, {pos.x, pos.y}, {1, 0, 0, 1}, {0.5f, 0.5f});
-			reticle->Draw();
-		}
+	if (isRockon) {
+		sprite2DReticle_->SetColor({1.0f, 0, 0, 1.0f});
+	} else {
+		sprite2DReticle_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	}
+	sprite2DReticle_->Draw();
+
+	viewProjection;
+	//sprite2DReticle_->Draw();
+	////for (Enemy* enemy : lockOnEnemys_) {
+	//	if (enemy_->isDeath() == false) {
+	//		Vector3 pos = enemy_->GetWorldPosition();
+	//		Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	//		Matrix4x4 matVPV = calculationMath_->Multiply(viewProjection.matView, calculationMath_->Multiply(viewProjection.matProjection, matViewPort));
+
+	//		pos = calculationMath_->Transform(pos, matVPV);
+	//		Sprite* reticle = Sprite::Create(textureReticle, {pos.x, pos.y}, {1, 0, 0, 1}, {0.5f, 0.5f});
+	//		reticle->Draw();
+	//	}
+	////}
 }
 
 // マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
@@ -397,8 +405,6 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 	// 合成行列の逆行列を計算する
 	Matrix4x4 matInverseVPV = calculationMath_->Inverse(matVPV);
-	
-	 MultiLockOn(viewProjection);
 	
 	 // スプライトの現在座標を取得
 	Vector2 spritePosition = sprite2DReticle_->GetPosition();
@@ -537,10 +543,10 @@ void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection
 	/////////////////////////////////////////////////////////////////////////////////////
 }
 
-bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) {
+bool Player::IsRockon(Enemy* enemy /* const std::list<Enemy*>& enemys*/, ViewProjection& viewProjection) {
 	Vector2 reticlePos = sprite2DReticle_->GetPosition();
 
-	for (Enemy* enemy : enemys) {
+	//for (Enemy* enemy : enemys) {
 		enemyPos = enemy->ChangeScreenPos(viewProjection);
 
 		length = calculationMath_->Length({reticlePos.x, reticlePos.y, 0}, enemyPos);
@@ -553,52 +559,17 @@ bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProje
 
 			return isRockon = true;
 		}
-	}
+	//}
 
 	return isRockon = false;
 }
 
-void Player::MultiLockOn(ViewProjection& viewProjection) { 
-	sprite2DReticle_->SetColor({1, 1, 1, 1});
-
-	if (lockOnEnemys_.size() == 0) {
-		isRockon = false;
-	}
-
-	for (Enemy* enemy : enemys_){
-		Vector3 pos = enemy->GetWorldPosition();
-		Vector2 spritePosition = sprite2DReticle_->GetPosition();
-		Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
-		Matrix4x4 matVPV = calculationMath_->Multiply(viewProjection.matView, calculationMath_->Multiply(viewProjection.matProjection, matViewPort));
-
-		pos = calculationMath_->Transform(pos, matVPV);
-
-		if (calculationMath_->Length(Vector2{pos.x, pos.y} - spritePosition) <= reticleRadius_) {
-			sprite2DReticle_->SetColor({1, 0, 0, 1});
-
-			bool isAdd = true;
-			for (Enemy* lockOnenemy : lockOnEnemys_) {
-				if (lockOnenemy == enemy) {
-					isAdd = false;
-					break;
-				}
-			}
-
-			if (isAdd) {
-				isRockon = true;
-				lockOnEnemys_.push_back(enemy);
-			}
-			break;
-		}
-	}
-}
-
 void Player::LockOnRemove() {
-	lockOnEnemys_.remove_if([](Enemy* enemy) {
-		if (enemy == nullptr) {
-			delete enemy;
-			return true;
+	//lockOnEnemys_.remove_if([](Enemy* enemy) {
+		if (enemy_ == nullptr) {
+			delete enemy_;
+			//return true;
 		}
-		return false;
-	});
+		//return false;
+	//});
 }

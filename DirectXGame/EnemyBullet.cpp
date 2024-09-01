@@ -32,7 +32,7 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 void EnemyBullet::Update() {
 
 	// 敵弾から自キャラへのベクトルを計算
-	Vector3 toPlayer = calculationMath_->Subtract(player_->GetWorldPosition(), GetWorldPosition());
+	Vector3 toPlayer = calculationMath_->Subtract(player_->GetWorldPosition(),player_->GetWorld3DReticlePosition());
 
 	// ベクトルを正規化する
 	toPlayer = calculationMath_->Normalize(toPlayer);

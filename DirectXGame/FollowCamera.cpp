@@ -22,9 +22,6 @@ void FollowCamera::Update() {
 }
 
 void FollowCamera::Follow() {
-	ImGui::Begin("Camera");
-	ImGui::SliderFloat3("rotation", &viewProjection_.rotation_.x, 0.0f, 6.28f);
-	ImGui::End();
 
 	// 追従対象がいれば
 	if (target_) {

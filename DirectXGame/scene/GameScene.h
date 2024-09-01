@@ -182,6 +182,21 @@ private: // メンバ変数
 	uint32_t textureClearUI_ = 0;
 	Sprite* spriteClearUI_ = nullptr;
 
+	uint32_t textureClearBG_ = 0;
+	Sprite* spriteClearBG_ = nullptr;
+
 	uint32_t textureGameOverUI_ = 0;
 	Sprite* spriteGameOverUI_ = nullptr;
+
+	uint32_t textureGameOverBG_ = 0;
+	Sprite* spriteGameOverBG_ = nullptr;
+
+	// BGM.SE
+	Audio* audioTitleBGM_ = nullptr;
+	uint32_t soundTitleBGM_ = 0;
+	uint32_t playTitleBGM_ = 0;
+
+	Audio* audioPlayBGM_ = nullptr;
+	uint32_t soundPlayBGM_ = 0;
+	uint32_t playPlayBGM_ = 0;
 };

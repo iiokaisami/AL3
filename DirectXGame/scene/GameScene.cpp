@@ -1,6 +1,5 @@
 #include "GameScene.h"
 #include "TextureManager.h"
-#include "AxisIndicator.h"
 #include <cassert>
 #include <fstream>
 #include "ImGuiManager.h"
@@ -49,11 +48,6 @@ void GameScene::Initialize() {
 
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
-
-	//軸方向表示の表示を有効にする
-	AxisIndicator::GetInstance()->SetVisible(true);
-	//軸方向表示が参照するビュープロジェクションを指定する（アドレス渡し）
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
 
 	// モデル
@@ -124,6 +118,11 @@ void GameScene::InitializeTitle() {
 	spriteTitleUI_ = Sprite::Create(textureTitleUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 
 	followCamera_->Initialize();
+
+	audioTitleBGM_ = Audio::GetInstance();
+	soundTitleBGM_ = audioTitleBGM_->LoadWave("bgm_title.wav");
+
+	playTitleBGM_ = audioTitleBGM_->PlayWave(soundTitleBGM_, true, 0.1f);
 }
 
 void GameScene::InitializePlay() {
@@ -133,25 +132,32 @@ void GameScene::InitializePlay() {
 	spritePlayUI_ = Sprite::Create(texturePlayUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 
 	followCamera_->Initialize();
-	AddEnemy({6.0f,2.0f,100.0f});
+	AddEnemy({6.0f, 2.0f, 100.0f});
 	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(), modelBullet_.get());
+
+	audioPlayBGM_ = Audio::GetInstance();
+	soundPlayBGM_ = audioPlayBGM_->LoadWave("bgm_play.wav");
+
+	playPlayBGM_ = audioPlayBGM_->PlayWave(soundPlayBGM_, true, 0.2f);
 }
 
 void GameScene::InitializeClear() {
 	// テクスチャ取得
 	textureClearUI_ = TextureManager::Load("clearUI.png");
+	textureClearBG_ = TextureManager::Load("clearBG.png");
 	// スプライト生成
 	spriteClearUI_ = Sprite::Create(textureClearUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
-
+	spriteClearBG_ = Sprite::Create(textureClearBG_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 	
 }
 
 void GameScene::InitializeGameOver() {
 	// テクスチャ取得
 	textureGameOverUI_ = TextureManager::Load("gameOverUI.png");
+	textureGameOverBG_ = TextureManager::Load("gameOverBG.png");
 	// スプライト生成
 	spriteGameOverUI_ = Sprite::Create(textureGameOverUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
-
+	spriteGameOverBG_ = Sprite::Create(textureGameOverBG_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 }
 
 void GameScene::Update() { 
@@ -250,8 +256,15 @@ void GameScene::Update() {
 }
 
 void GameScene::UpdateTitle() { 
+
+	XINPUT_STATE joyState;
+
+	// ゲームパッド未接続なら何もせずに抜ける
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {}
 	
-	
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+		audioTitleBGM_->StopWave(playTitleBGM_);
+	}
 
 }
 
@@ -266,12 +279,14 @@ void GameScene::UpdatePlay() {
 
 void GameScene::UpdateClear() { 
 
+	audioTitleBGM_->StopWave(playPlayBGM_);
 	player_->DeleteBullet();
 
 }
 
 void GameScene::UpdateGameOver() {
 
+	audioTitleBGM_->StopWave(playPlayBGM_);
 	player_->DeleteBullet();
 
 }
@@ -365,6 +380,7 @@ void GameScene::DrawClear() {
 }
 
 void GameScene::DrawClear2D() {
+	//spriteClearBG_->Draw();
 	spriteClearUI_->Draw();
 }
 
@@ -378,6 +394,7 @@ void GameScene::DrawGameOver() {
 }
 
 void GameScene::DrawGameOver2D() {
+	spriteGameOverBG_->Draw();
 	spriteGameOverUI_->Draw();
 }
 
@@ -501,6 +518,7 @@ bool GameScene::ToPlay() {
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -512,6 +530,7 @@ bool GameScene::PlayToClear() {
 		return false;
 	}
 
+		
 
 	for (Enemy* enemy : enemys_) {
 		if (enemy->GetIsDeath()){
@@ -531,6 +550,7 @@ bool GameScene::PlayToGameOver() {
 		return false;
 	}
 
+	
 
 	if (player_->GetIsDeath()) {
 		return true;

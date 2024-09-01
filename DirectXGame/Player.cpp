@@ -1,5 +1,4 @@
 #include "Player.h"
-#include "ImGuiManager.h"
 #include "cassert"
 #include "TextureManager.h"
 #include "WinApp.h"
@@ -109,6 +108,7 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
 
 	worldTransform_.UpdateMatrix();
+	worldTransform3DReticle_.UpdateMatrix();
 
 	// デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
@@ -140,8 +140,6 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	if (hitPoint <= 0){
 		isDeath_ = true;
 	}
-
-	//IsRockon(enemys, viewProjection);
 	enemys;
 
 	// 弾更新
@@ -175,6 +173,7 @@ void Player::Attack() {
 		// Y軸周り角度(θy)
 		worldTransform_.rotation_.y = std::atan2(velocity.x, velocity.z);
 
+
 		// 自機から標準オブジェクトへのベクトル
 		velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
 		velocity = calculationMath_->Multiply(kBulletSpeed, calculationMath_->Normalize(velocity));
@@ -189,7 +188,7 @@ void Player::Attack() {
 
 		// Y軸周り角度(θy)
 		Vector3 num = {0, 0, 0};
-		num.y = std::atan2(velocity_.x, velocity_.z) * -1;
+		num.y = worldTransform_.rotation_.y; 
 
 		newBullet->SetWorldRotation(num);
 
@@ -197,6 +196,7 @@ void Player::Attack() {
 		bullets_.push_back(newBullet);
 
 		isAttack_ = true;
+
 	}
 }
 
@@ -228,11 +228,13 @@ void Player::SetAttackParameter(float attackParameter, uint16_t attackCycle) {
 }
 
 void Player::Draw() {
+
+	if (!GetIsDeath()) {
 		modelBody_->Draw(worldTransformBody_, *viewProjection_);
 		modelHead_->Draw(worldTransformHead_, *viewProjection_);
 		modelL_arm_->Draw(worldTransformL_arm_, *viewProjection_);
 		modelR_arm_->Draw(worldTransformR_arm_, *viewProjection_);
-	
+	}
 
 	// 弾描画
 	for (PlayerBullet* bullet : bullets_) {
@@ -275,6 +277,7 @@ void Player::Move() {
 void Player::Turn(){
 	//Y軸周り角度(0ｙ)
 	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+
 	float velocityX = calculationMath_->Length({velocity_.x, 0.0f, 0.0f});
 	// X軸周り角度(0x)
 	worldTransform_.rotation_.x = std::atan2(0.0f, velocityX);
@@ -289,18 +292,6 @@ void Player::InitializeFloatingGimick() {
 }
 
 void Player::UpdateFloatingGimick() {
-	ImGui::Begin("Floating Model");
-	ImGui::SliderFloat3("Base Translation", &worldTransform_.translation_.x, -20.0f, 20.0f);
-	ImGui::SliderFloat3("Head Translation", &worldTransformHead_.translation_.x, -20.0f, 20.0f);
-	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.translation_.x, -20.0f, 20.0f);
-	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.translation_.x, -20.0f, 20.0f);
-	int cycle = static_cast<int>(floatingCycle_);
-	ImGui::SliderInt("Cycle", &cycle, 0, 600);
-	floatingCycle_ = static_cast<uint16_t>(cycle);
-
-	ImGui::SliderFloat("Amplitude", &floatingAmplitude_, 0.0f, 10.0f);
-
-	ImGui::End();
 
 	const float step = 2.0f * std::numbers::pi_v<float> / floatingCycle_;
 
@@ -424,7 +415,6 @@ void Player::DrawUI(ViewProjection& viewProjection) {
 	viewProjection;
 }
 
-// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
 void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
 	// ビュープロジェクションビューポート合成行列
 	Matrix4x4 matVPV = calculationMath_->Multiply(viewProjection.matView, calculationMath_->Multiply(viewProjection.matProjection, matViewPort));
@@ -452,8 +442,8 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 
 		 // スクリーン座標
-		 Vector3 posNear = Vector3((float)mousePosition.x, (float)mousePosition.y, 0);
-		 Vector3 posFar = Vector3((float)mousePosition.x, (float)mousePosition.y, 1);
+		 Vector3 posNear = Vector3(640, 360, 0);
+		 Vector3 posFar = Vector3(640 ,360, 1);
 
 		 // スクリーン座標系からワールド座標系へ
 		 posNear = calculationMath_->Transform(posNear, matInverseVPV);
@@ -502,29 +492,6 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, controlDirection), cPosNear);
 	 worldTransform3DReticle_.UpdateMatrix();
 
-}
-
-
-
-bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) {
-	Vector2 reticlePos = sprite2DReticle_->GetPosition();
-
-	for (Enemy* enemy : enemys) {
-		enemyPos = enemy->ChangeScreenPos(viewProjection);
-
-		length = calculationMath_->Length({reticlePos.x, reticlePos.y, 0}, enemyPos);
-
-		if (length <= 20.0f) {
-			sprite2DReticle_->SetPosition({enemyPos.x, enemyPos.y});
-
-			rockOnVelocity = enemy->GetWorldPosition() - GetWorldPosition();
-			rockOnVelocity = kBulletSpeed * calculationMath_->Normalize(rockOnVelocity);
-
-			return isRockon = true;
-		}
-	}
-
-	return isRockon = false;
 }
 
 void Player::LockOnRemove() {

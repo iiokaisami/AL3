@@ -81,10 +81,6 @@ public:
 
 	void SetEnemy(std::list<Enemy*> enemy) { enemys_ = enemy; }
 
-	void PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection);
-
-	bool IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection);
-
 	void LockOnRemove(); 
 
 	bool Damage();

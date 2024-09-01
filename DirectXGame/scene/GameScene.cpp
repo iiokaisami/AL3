@@ -66,14 +66,12 @@ void GameScene::Initialize() {
 	modelEnemyBullet_.reset(Model::CreateFromOBJ("enemyBullet", true));
 
 
-	texture_ = TextureManager::Load("reticle.png");
-	model_ = Model::Create();
 
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
 	Vector3 playerPosition(0, 0, 20.0f);
-	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(),modelBullet_.get(),model_,texture_);
+	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(),modelBullet_.get());
 	 
 	LoadEnemyPopData();
 	 
@@ -137,7 +135,7 @@ void GameScene::InitializePlay() {
 
 	followCamera_->Initialize();
 	AddEnemy({6.0f, 2.0f, 100.0f});
-	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(), modelBullet_.get(), model_, texture_);
+	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(), modelBullet_.get());
 
 	audioPlayBGM_ = Audio::GetInstance();
 	soundPlayBGM_ = audioPlayBGM_->LoadWave("bgm_play.wav");
@@ -370,7 +368,7 @@ void GameScene::DrawTitle2D() {
 }
 
 void GameScene::DrawPlay() {
-	
+	player_->Draw();
 
 	// 敵描画
 	for (Enemy* enemy : enemys_) {
@@ -383,8 +381,6 @@ void GameScene::DrawPlay() {
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Draw(viewProjection_);
 	}
-
-	player_->Draw();
 }
 
 void GameScene::DrawPlay2D() { 
@@ -402,14 +398,12 @@ void GameScene::DrawClear2D() {
 }
 
 void GameScene::DrawGameOver() {
-	
+	player_->Draw();
 	for (Enemy* enemy : enemys_) {
 		if (enemy) {
 			enemy->Draw(viewProjection_);
 		}
 	}
-
-	player_->Draw();
 }
 
 void GameScene::DrawGameOver2D() {

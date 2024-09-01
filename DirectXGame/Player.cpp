@@ -25,7 +25,7 @@ Player::~Player() {
 	}
 }
 
-void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet, Model* model, uint32_t font) {
+void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm,Model* modelBullet) {
 
 	// NULLポインタチェック
 	assert(modelBody);
@@ -33,9 +33,9 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	assert(modelL_arm);
 	assert(modelR_arm);
 
-	assert(model);
-	model_ = model;
-	font_ = font;
+	//assert(model);
+	//model_ = model;
+	//font_ = font;
 
 	modelBody_ = modelBody;
 	modelHead_ = modelHead;
@@ -250,7 +250,7 @@ void Player::Draw() {
 	}
 
 	//3Dレティクルを描画
-	model_->Draw(worldTransform3DReticle_, *viewProjection_, font_);
+	modelBullet_->Draw(worldTransform3DReticle_, *viewProjection_);
 }
 
 void Player::Move() {

@@ -18,7 +18,7 @@ class Player :public Collider
 public:
 	~Player();
 
-	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet, Model* model, uint32_t font);
+	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet);
 
 	void Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys);
 
@@ -106,9 +106,8 @@ private:
 	// 弾
 	Model* modelBullet_ = nullptr;
 	
-	Model* model_ = nullptr;
 	// テクスチャハンドル
-	uint32_t font_ = 0u;
+	//uint32_t font_ = 0u;
 
 	// キーボード入力
 	Input* input_ = nullptr;

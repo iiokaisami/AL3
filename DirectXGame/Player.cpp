@@ -83,15 +83,27 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 
 	// レティクル用テクスチャ取得
 	textureReticle = TextureManager::Load("reticle.png");
+	textureHitPoint1_ = TextureManager::Load("hitPoint1.png");
+	textureHitPoint2_ = TextureManager::Load("hitPoint2.png");
+	textureHitPoint3_ = TextureManager::Load("hitPoint3.png");
 
 	// スプライト生成
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	spriteHitPoint1_ = Sprite::Create(textureHitPoint1_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	spriteHitPoint2_ = Sprite::Create(textureHitPoint2_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	spriteHitPoint3_ = Sprite::Create(textureHitPoint3_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 
 	SetCollisionAttribute(0b1);
 
 	SetCollisionMask(0b1 << 1);
 
-	
+	 hitPoint = 4.0f;
+
+	 damageCount = 61.0f;
+
+	 isHit = false;
+
+	 isDeath_ = false;
 };
 
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
@@ -121,9 +133,13 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	state_->Update();
 
 	MouseReticle(matViewPort, viewProjection);
+	
+	Damage();
+	
 
-	//PlayerReticle(matViewPort, viewProjection);
-
+	if (hitPoint <= 0){
+		isDeath_ = true;
+	}
 
 	//IsRockon(enemys, viewProjection);
 	enemys;
@@ -146,6 +162,19 @@ void Player::Attack() {
 	//Rトリガーを押していたら
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER){
 
+
+		Vector3 toPlayer = calculationMath_->Subtract(GetWorld3DReticlePosition(), GetWorldPosition());
+
+		// ベクトルを正規化する
+		toPlayer = calculationMath_->Normalize(toPlayer);
+		velocity = calculationMath_->Normalize(velocity);
+		// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+		velocity = calculationMath_->Multiply(1.0f, calculationMath_->Slerp(velocity, toPlayer, 0.05f));
+
+		// 進行方向に見た目の回転を合わせる(ex1)
+		// Y軸周り角度(θy)
+		worldTransform_.rotation_.y = std::atan2(velocity.x, velocity.z);
+
 		// 自機から標準オブジェクトへのベクトル
 		velocity = calculationMath_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
 		velocity = calculationMath_->Multiply(kBulletSpeed, calculationMath_->Normalize(velocity));
@@ -158,12 +187,11 @@ void Player::Attack() {
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
 
-		//// Y軸周り角度(θy)
-		//Vector3 num = {0, 0, 0};
-		//num.y = std::atan2(velocity_.x, velocity_.z);
+		// Y軸周り角度(θy)
+		Vector3 num = {0, 0, 0};
+		num.y = std::atan2(velocity_.x, velocity_.z) * -1;
 
-		//worldTransform_.rotation_ = num;
-		//newBullet->SetWorldRotation(num);
+		newBullet->SetWorldRotation(num);
 
 		// 弾を登録する
 		bullets_.push_back(newBullet);
@@ -200,10 +228,11 @@ void Player::SetAttackParameter(float attackParameter, uint16_t attackCycle) {
 }
 
 void Player::Draw() {
-	modelBody_->Draw(worldTransformBody_, *viewProjection_);
-	modelHead_->Draw(worldTransformHead_, *viewProjection_);
-	modelL_arm_->Draw(worldTransformL_arm_, *viewProjection_);
-	modelR_arm_->Draw(worldTransformR_arm_, *viewProjection_);
+		modelBody_->Draw(worldTransformBody_, *viewProjection_);
+		modelHead_->Draw(worldTransformHead_, *viewProjection_);
+		modelL_arm_->Draw(worldTransformL_arm_, *viewProjection_);
+		modelR_arm_->Draw(worldTransformR_arm_, *viewProjection_);
+	
 
 	// 弾描画
 	for (PlayerBullet* bullet : bullets_) {
@@ -356,7 +385,9 @@ Vector3 Player::GetWorld3DReticlePosition() {
 }
 
 void Player::OnCollision() {
-	// 何もしない
+	
+	isHit = true;
+	hitPoint -= kDamage;
 }
 
 void Player::ChangeState(std::unique_ptr<BasePlayerState> state) {
@@ -376,26 +407,21 @@ void Player::SetParent(const WorldTransform* parent) {
 }
 
 void Player::DrawUI(ViewProjection& viewProjection) {
-	if (isRockon) {
-		sprite2DReticle_->SetColor({1.0f, 0, 0, 1.0f});
-	} else {
-		sprite2DReticle_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	}
-	sprite2DReticle_->Draw();
-
-	viewProjection;
+	
 	//sprite2DReticle_->Draw();
-	////for (Enemy* enemy : lockOnEnemys_) {
-	//	if (enemy_->isDeath() == false) {
-	//		Vector3 pos = enemy_->GetWorldPosition();
-	//		Matrix4x4 matViewPort = calculationMath_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
-	//		Matrix4x4 matVPV = calculationMath_->Multiply(viewProjection.matView, calculationMath_->Multiply(viewProjection.matProjection, matViewPort));
 
-	//		pos = calculationMath_->Transform(pos, matVPV);
-	//		Sprite* reticle = Sprite::Create(textureReticle, {pos.x, pos.y}, {1, 0, 0, 1}, {0.5f, 0.5f});
-	//		reticle->Draw();
-	//	}
-	////}
+	if (!Damage()) {
+		if (hitPoint >= 1) {
+			spriteHitPoint1_->Draw();
+			if (hitPoint >= 2) {
+				spriteHitPoint2_->Draw();
+				if (hitPoint >= 3) {
+					spriteHitPoint3_->Draw();
+				}
+			}
+		}
+	}
+	viewProjection;
 }
 
 // マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
@@ -443,17 +469,6 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 		  worldTransform3DReticle_.UpdateMatrix();
 
-		 ImGui::Begin("Player");
-
-		 ImGui::Text("2DReticle:(%.2f,%.2f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);
-		 ImGui::Text("Near:(%+.2f,%+.2f,%+.2f)", posNear.x, posNear.y, posNear.z);
-		 ImGui::Text("Far:(%+.2f,%+.2f,%+.2f)", posFar.x, posFar.y, posFar.z);
-		 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
-
-		 ImGui::Text("w:(%+.2f,%+.2f,%+.2f)", GetWorldPosition().x, GetWorldPosition().y, GetWorldPosition().z);
-
-		 ImGui::End();
-		 
 		 return;
 	 }
 
@@ -487,61 +502,9 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, controlDirection), cPosNear);
 	 worldTransform3DReticle_.UpdateMatrix();
 
-
-	 ImGui::Begin("Player");
-
-	 ImGui::Text("2DReticle:(%.2f,%.2f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);
-	 ImGui::Text("Near:(%+.2f,%+.2f,%+.2f)", cPosNear.x, cPosNear.y, cPosNear.z);
-	 ImGui::Text("Far:(%+.2f,%+.2f,%+.2f)", cPosFar.x, cPosFar.y, cPosFar.z);
-	 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
-
-	 ImGui::Checkbox("Jump", &isJump_);
-	 if (isJump_) {
-		 Jump();
-	 }
-
-	 ImGui::End();
-
 }
 
-void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
-	////////////////自機のワールド座標から3Dレティクルのワールド座標を計算///////////////////
 
-	// 自機から3Dレティクルへの距離
-	const float kDistancePlayerTo3DReticle = 50.0f;
-
-	// 自機から3Dレティクルへのオフセット(Z+向き)
-	Vector3 offset = {0, 0, kDistancePlayerTo3DReticle};
-
-	// 自機のワールド行列の回転を反映
-	offset = calculationMath_->Transform(offset, worldTransform_.matWorld_);
-
-	// ベクトルの長さを整える
-	offset = calculationMath_->Multiply(kDistancePlayerTo3DReticle, calculationMath_->Normalize(offset));
-
-	// 3Dレティクルの座標を設定
-	worldTransform3DReticle_.translation_ = calculationMath_->Add(GetWorldPosition(), offset);
-	worldTransform3DReticle_.UpdateMatrix();
-
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	///////3Dレコードレティクルのワールド座標から2Dレティクルのスクリーン座標を計算//////
-
-	positionReticle_.x = worldTransform3DReticle_.matWorld_.m[3][0];
-	positionReticle_.y = worldTransform3DReticle_.matWorld_.m[3][1];
-	positionReticle_.z = worldTransform3DReticle_.matWorld_.m[3][2];
-
-	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
-	Matrix4x4 matViewProjectionViewport = calculationMath_->Multiply(calculationMath_->Multiply(viewProjection.matView, viewProjection.matProjection), matViewPort);
-
-	// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
-	positionReticle_ = calculationMath_->Transform(positionReticle_, matViewProjectionViewport);
-
-	// スプライトのレティクルに座標設定
-	sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
-
-	/////////////////////////////////////////////////////////////////////////////////////
-}
 
 bool Player::IsRockon(const std::list<Enemy*>& enemys, ViewProjection& viewProjection) {
 	Vector2 reticlePos = sprite2DReticle_->GetPosition();
@@ -572,4 +535,31 @@ void Player::LockOnRemove() {
 		}
 		return false;
 	});
+}
+
+bool Player::Damage() { 
+	if (isHit) {
+		damageCount -= 1.0f;
+	}
+
+	if ((damageCount <= 60.0f && damageCount > 50.0f) or
+		(damageCount <= 30.0f && damageCount > 20.0f) or 
+		(damageCount <= 10.0f && damageCount > 0.0f)) {
+		return true;
+	}
+
+	if (damageCount <= 0)
+	{
+		isHit = false;
+		damageCount = 61.0f;
+		return false;
+	}
+
+	return false;
+}
+
+void Player::DeleteBullet() {
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->SetIsDead();
+	}
 }

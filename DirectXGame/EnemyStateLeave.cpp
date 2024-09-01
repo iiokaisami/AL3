@@ -1,6 +1,6 @@
 #include "EnemyStateLeave.h"
 #include "Enemy.h"
-#include "EnemyStateApproach.h"
+#include "EnemyStateRoot.h"
 
 EnemyStateLeave::EnemyStateLeave(Enemy* enemy) : BaseEnemyState("State Leave", enemy) {
 	

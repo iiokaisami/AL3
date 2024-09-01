@@ -21,7 +21,7 @@ public:
 
 	~Enemy();
 
-	void Initialize(Model* model, Vector3 position);
+	void Initialize(Model* model, Vector3 position, Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm);
 
 	void Update();
 
@@ -31,9 +31,13 @@ public:
 	void Draw(ViewProjection& viewProjection_);
 
 	// 発射間隔
-	static const int32_t kFireInterval = 60;
+	static const int32_t kFireInterval = 100;
 
 	void SetPlayer(Player* player) { player_ = player; }
+
+	void InitializeFloatingGimick();
+
+	void UpdateFloatingGimick();
 
 	Vector3 GetWorldPosition() override;
 
@@ -71,13 +75,26 @@ public:
 
 	Vector3 ChangeScreenPos(ViewProjection& viewProjection_);
 
+	bool GetIsDeath() { return isDeath_; }
+
+
+	void Move();
+
 private:
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	WorldTransform worldTransformBody_;
+	WorldTransform worldTransformHead_;
+	WorldTransform worldTransformL_arm_;
+	WorldTransform worldTransformR_arm_;
 
 	// モデル
 	Model* model_ = nullptr;
+	Model* modelBody_ = nullptr;
+	Model* modelHead_ = nullptr;
+	Model* modelL_arm_ = nullptr;
+	Model* modelR_arm_ = nullptr;
 
 	// テクスチャハンドル
 	uint32_t kamata_ = 0u;
@@ -118,4 +135,12 @@ private:
 	bool isFire = false;
 
 	std::list<TimeCall*> timeCalls_;
+
+	
+	float floatingParameter_;
+	float floatingAmplitude_;
+	uint16_t floatingCycle_;
+
+	Vector3 toPlayer = {};
+	Vector3 velocity = {0, 0, 0};
 };

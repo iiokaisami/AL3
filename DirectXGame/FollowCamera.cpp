@@ -9,6 +9,7 @@ FollowCamera::~FollowCamera() {
 
 void FollowCamera::Initialize() {
 	viewProjection_.Initialize();
+	viewProjection_.rotation_ = {0, 0, 0};
 	calculationMath_ = new CalculationMath;
 }
 

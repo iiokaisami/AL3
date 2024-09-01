@@ -15,17 +15,12 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 
 	calculationMath_ = new CalculationMath;
 
-	// テクスチャ読み込み
-	uv_ = TextureManager::Load("uvChecker.png");
-
 	worldTransform_.Initialize();
 
 	// 引数で受け取った初期座標をリセット
 	worldTransform_.translation_ = position;
 
-	worldTransform_.scale_.x = 0.5f;
-	worldTransform_.scale_.y = 0.5f;
-	worldTransform_.scale_.z = 3.0f;
+	
 
 	radius_ = 2.0f;
 
@@ -68,7 +63,7 @@ void EnemyBullet::Update() {
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, uv_);
+	model_->Draw(worldTransform_, viewProjection);
 }
 
 void EnemyBullet::OnCollision() {

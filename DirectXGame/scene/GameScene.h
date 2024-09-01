@@ -40,6 +40,12 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize();
 
+	// それぞれの初期化
+	void InitializeTitle();
+	void InitializePlay();
+	void InitializeClear();
+	void InitializeGameOver();
+
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
@@ -62,7 +68,9 @@ public: // メンバ関数
 	void DrawPlay();
 	void DrawPlay2D();
 	void DrawClear();
+	void DrawClear2D();
 	void DrawGameOver();
+	void DrawGameOver2D();
 
 
 	void AddEnemyBullet(EnemyBullet* enemyBullet);
@@ -93,7 +101,7 @@ public: // メンバ関数
 	void ChangeState(std::unique_ptr<BaseSceneState> state);
 
 	// 画面切り替え条件
-	bool TitleToPlay();
+	bool ToPlay();
 	bool PlayToClear();
 	bool PlayToGameOver();
     bool ToTitle();
@@ -120,7 +128,6 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	ViewProjection viewProjection_;
 	Skydome* skydome_ = nullptr;
-	//RailCamera* railCamera_ = nullptr;
 	FollowCamera* followCamera_ = nullptr;
 	Ground* ground_ = nullptr;
 
@@ -142,6 +149,13 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelFighterR_arm_;
 	// 自弾
 	std::unique_ptr<Model> modelBullet_;
+	// 敵
+	std::unique_ptr<Model> modelFighterBody_E_;
+	std::unique_ptr<Model> modelFighterHead_E_;
+	std::unique_ptr<Model> modelFighterL_arm_E_;
+	std::unique_ptr<Model> modelFighterR_arm_E_;
+	// 敵弾
+	std::unique_ptr<Model> modelEnemyBullet_;
 
 	//待機中フラグ
 	bool isWaiting = true;
@@ -154,4 +168,20 @@ private: // メンバ変数
 	CalculationMath* calculationMath_ = nullptr;
 
 	std::unique_ptr<BaseSceneState> state_;
+
+	// 描画
+	uint32_t textureTitleLogo_ = 0;
+	Sprite* spriteTitleLogo_ = nullptr;
+
+	uint32_t textureTitleUI_ = 0;
+	Sprite* spriteTitleUI_ = nullptr;
+
+	uint32_t texturePlayUI_ = 0;
+	Sprite* spritePlayUI_ = nullptr;
+
+	uint32_t textureClearUI_ = 0;
+	Sprite* spriteClearUI_ = nullptr;
+
+	uint32_t textureGameOverUI_ = 0;
+	Sprite* spriteGameOverUI_ = nullptr;
 };

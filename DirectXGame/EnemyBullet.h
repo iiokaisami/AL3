@@ -12,7 +12,7 @@ public:
 	void Initialize(Model* model, const Vector3& position, const Vector3 velocity);
 
 	void Update();
-
+	
 	void Draw(const ViewProjection& viewProjection);
 
 	bool IsDead() const { return isDead_; }
@@ -37,8 +37,6 @@ private:
 
 	// モデル
 	Model* model_ = nullptr;
-	// テクスチャハンドル
-	uint32_t uv_ = 0u;
 
 	// 速度
 	Vector3 velocity_ = {0, 0, 0};

@@ -2,11 +2,14 @@
 #include "SceneStatePlay.h"
 #include "GameScene.h"
 
-SceneStateTitle::SceneStateTitle(GameScene* gameScene) : BaseSceneState("State Title", gameScene) {}
+SceneStateTitle::SceneStateTitle(GameScene* gameScene) : BaseSceneState("State Title", gameScene) { 
+	gameScene_->InitializeTitle();
+}
 
 void SceneStateTitle::Update() {
+	gameScene_->UpdateTitle();
 
-	if (gameScene_->TitleToPlay())
+	if (gameScene_->ToPlay())
 	{
 		gameScene_->ChangeState(std::make_unique<SceneStatePlay>(gameScene_));
 	}

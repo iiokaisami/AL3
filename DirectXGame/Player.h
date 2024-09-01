@@ -87,6 +87,12 @@ public:
 
 	void LockOnRemove(); 
 
+	bool Damage();
+
+	void DeleteBullet();
+
+	bool GetIsDeath() { return isDeath_; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -137,7 +143,7 @@ private:
 	WorldTransform worldTransform3DReticle_;
 
 	uint32_t textureReticle = 0;
-
+	
 	//2Dレティクル用のスプライト
 	std::list<Sprite*> lockOnSprite2DReticle_ ;
 	std::list<Enemy*> lockOnEnemys_;
@@ -145,6 +151,15 @@ private:
 	Sprite* sprite2DReticle_ = nullptr;
 	Vector2 spritePos_;
 	Vector3 positionReticle_ = {0, 0, 0};
+
+	uint32_t textureHitPoint1_ = 0;
+	Sprite* spriteHitPoint1_ = nullptr;
+
+	uint32_t textureHitPoint2_ = 0;
+	Sprite* spriteHitPoint2_ = nullptr;
+
+	uint32_t textureHitPoint3_ = 0;
+	Sprite* spriteHitPoint3_ = nullptr;
 
 	const ViewProjection* viewProjection_ = nullptr;
 
@@ -180,4 +195,10 @@ private:
 	float floatingAmplitude_;
 	// 浮遊移動のサイクル
 	uint16_t floatingCycle_;
+
+	float hitPoint = 4.0f;
+	const float kDamage = 1.0f;
+	float damageCount = 60.0f;
+	bool isHit = false;
+	bool isDeath_ = false;
 };

@@ -5,8 +5,10 @@
 #include <fstream>
 #include "ImGuiManager.h"
 
-#include "PlayerStateRoot.h"
 #include "SceneStateTitle.h"
+#include "SceneStatePlay.h"
+#include "SceneStateClear.h"
+#include "SceneStateGameOver.h"
 
 GameScene::GameScene() {}
 
@@ -62,6 +64,13 @@ void GameScene::Initialize() {
 
 	modelBullet_.reset(Model::CreateFromOBJ("hammer", true));
 
+	modelFighterBody_E_.reset(Model::CreateFromOBJ("float_Body_E", true));
+	modelFighterHead_E_.reset(Model::CreateFromOBJ("float_Head_E", true));
+	modelFighterL_arm_E_.reset(Model::CreateFromOBJ("float_L_arm_E", true));
+	modelFighterR_arm_E_.reset(Model::CreateFromOBJ("float_R_arm_E", true));
+
+	modelEnemyBullet_.reset(Model::CreateFromOBJ("enemyBullet", true));
+
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
@@ -105,6 +114,46 @@ void GameScene::Initialize() {
 	 calculationMath_ = new CalculationMath;
 }
 
+void GameScene::InitializeTitle() {
+	// テクスチャ取得
+	textureTitleLogo_ = TextureManager::Load("titleLogo.png");
+	textureTitleUI_ = TextureManager::Load("titleUI.png");
+
+	// スプライト生成
+	spriteTitleLogo_ = Sprite::Create(textureTitleLogo_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	spriteTitleUI_ = Sprite::Create(textureTitleUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
+	followCamera_->Initialize();
+}
+
+void GameScene::InitializePlay() {
+	// テクスチャ取得
+	texturePlayUI_ = TextureManager::Load("playUI.png");
+	// スプライト生成
+	spritePlayUI_ = Sprite::Create(texturePlayUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
+	followCamera_->Initialize();
+	AddEnemy({6.0f,2.0f,100.0f});
+	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(), modelBullet_.get());
+}
+
+void GameScene::InitializeClear() {
+	// テクスチャ取得
+	textureClearUI_ = TextureManager::Load("clearUI.png");
+	// スプライト生成
+	spriteClearUI_ = Sprite::Create(textureClearUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
+	
+}
+
+void GameScene::InitializeGameOver() {
+	// テクスチャ取得
+	textureGameOverUI_ = TextureManager::Load("gameOverUI.png");
+	// スプライト生成
+	spriteGameOverUI_ = Sprite::Create(textureGameOverUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
+}
+
 void GameScene::Update() { 
 
 	#ifdef _DEBUG
@@ -134,12 +183,7 @@ void GameScene::Update() {
 
 		viewProjection_.TransferMatrix();
 	}
-
 	
-	
-
-	//自キャラの更新
-	player_->Update(viewProjection_,enemys_);
 
 	UpdateEnemyPopCommands();
 
@@ -173,11 +217,11 @@ void GameScene::Update() {
 
 				// 弾を生成し、初期化
 				EnemyBullet* newBullet = new EnemyBullet();
-				newBullet->Initialize(model_, enemy->GetWorldPosition(), enemy->GetVelocity());
+				newBullet->Initialize(modelEnemyBullet_.get(), enemy->GetWorldPosition(), enemy->GetVelocity());
 				newBullet->SetPlayer(player_);
 
 				// 弾を登録する
-				//AddEnemyBullet(newBullet);
+				AddEnemyBullet(newBullet);
 
 				enemy->SetIsFire(false);
 			}
@@ -203,6 +247,33 @@ void GameScene::Update() {
 	ground_->Update();
 
 	skydome_->Update();
+}
+
+void GameScene::UpdateTitle() { 
+	
+	
+
+}
+
+void GameScene::UpdatePlay() {
+
+	UpdateEnemyPopCommands();
+
+	// 自キャラの更新
+	player_->Update(viewProjection_, enemys_);
+
+}
+
+void GameScene::UpdateClear() { 
+
+	player_->DeleteBullet();
+
+}
+
+void GameScene::UpdateGameOver() {
+
+	player_->DeleteBullet();
+
 }
 
 void GameScene::Draw() {
@@ -263,8 +334,9 @@ void GameScene::DrawTitle() {
 
 }
 
-void GameScene::DrawTitle2D() {
-
+void GameScene::DrawTitle2D() { 
+	spriteTitleLogo_->Draw();
+	spriteTitleUI_->Draw();
 }
 
 void GameScene::DrawPlay() {
@@ -285,14 +357,28 @@ void GameScene::DrawPlay() {
 
 void GameScene::DrawPlay2D() { 
 	player_->DrawUI(viewProjection_); 
+	spritePlayUI_->Draw();
 }
 
-void GameScene::DrawClear() {
+void GameScene::DrawClear() { 
+	player_->Draw(); 
+}
 
+void GameScene::DrawClear2D() {
+	spriteClearUI_->Draw();
 }
 
 void GameScene::DrawGameOver() {
+	player_->Draw();
+	for (Enemy* enemy : enemys_) {
+		if (enemy) {
+			enemy->Draw(viewProjection_);
+		}
+	}
+}
 
+void GameScene::DrawGameOver2D() {
+	spriteGameOverUI_->Draw();
 }
 
 
@@ -305,7 +391,7 @@ void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 void GameScene::AddEnemy(Vector3 position) {
 	
 	Enemy* enemy = new Enemy;
-	enemy->Initialize(model_, position);
+	enemy->Initialize(model_, position, modelFighterBody_E_.get(),modelFighterHead_E_.get(), modelFighterL_arm_E_.get(), modelFighterR_arm_E_.get());
 
 	// 敵キャラにゲームシーンを渡す
 	enemy->SetGameScene(this);
@@ -376,8 +462,10 @@ void GameScene::UpdateEnemyPopCommands() {
 			float z = (float)std::atof(word.c_str());
 
 			// 敵を発生させる
-			AddEnemy(Vector3(x, y, z));
-			
+			//AddEnemy(Vector3(x, y, z));
+			x;
+			y;
+			z;
 
 		}
 		// WAITコマンド
@@ -402,7 +490,7 @@ void GameScene::UpdateEnemyPopCommands() {
 void GameScene::ChangeState(std::unique_ptr<BaseSceneState> state) { 
 	state_ = std::move(state); }
 
-bool GameScene::TitleToPlay() {
+bool GameScene::ToPlay() {
 	XINPUT_STATE joyState;
 
 	// ゲームパッド未接続なら何もせずに抜ける
@@ -423,6 +511,15 @@ bool GameScene::PlayToClear() {
 	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
 		return false;
 	}
+
+
+	for (Enemy* enemy : enemys_) {
+		if (enemy->GetIsDeath()){
+			return true;
+		}
+	}
+
+
 	return false;
 }
 
@@ -433,6 +530,13 @@ bool GameScene::PlayToGameOver() {
 	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
 		return false;
 	}
+
+
+	if (player_->GetIsDeath()) {
+		return true;
+	}
+
+
 	return false;
 }
 
@@ -444,7 +548,7 @@ bool GameScene::ToTitle() {
 		return false;
 	}
 
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) {
 		return true;
 	}
 	return false;

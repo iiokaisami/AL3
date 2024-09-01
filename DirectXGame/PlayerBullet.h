@@ -22,6 +22,8 @@ public:
 
 	bool IsDead() const { return isDead_; }
 
+	void SetIsDead() { isDead_ = true; }
+
 	// 衝突を検出したら呼び出されるコールバック関数
 	void OnCollision() override;
 

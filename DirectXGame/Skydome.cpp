@@ -13,7 +13,7 @@ void Skydome::Initialize(Model* model) {
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = {0, 0, 0};
 
-	worldTransform_.scale_ = {300, 300, 300};
+	worldTransform_.scale_ = {1500, 1500, 1500};
 
 	calculationMath_ = new CalculationMath;
 

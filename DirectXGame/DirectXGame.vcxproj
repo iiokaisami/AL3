@@ -119,7 +119,7 @@
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
-    <ClCompile Include="EnemyStateApproach.cpp" />
+    <ClCompile Include="EnemyStateRoot.cpp" />
     <ClCompile Include="EnemyStateLeave.cpp" />
     <ClCompile Include="FollowCamera.cpp" />
     <ClCompile Include="Ground.cpp" />
@@ -130,6 +130,8 @@
     <ClCompile Include="PlayerStateAttack.cpp" />
     <ClCompile Include="PlayerStateJump.cpp" />
     <ClCompile Include="PlayerStateRoot.cpp" />
+    <ClCompile Include="SceneStateClear.cpp" />
+    <ClCompile Include="SceneStateGameOver.cpp" />
     <ClCompile Include="SceneStatePlay.cpp" />
     <ClCompile Include="SceneStateTitle.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
@@ -171,7 +173,7 @@
     <ClInclude Include="Easing.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
-    <ClInclude Include="EnemyStateApproach.h" />
+    <ClInclude Include="EnemyStateRoot.h" />
     <ClInclude Include="EnemyStateLeave.h" />
     <ClInclude Include="FollowCamera.h" />
     <ClInclude Include="Ground.h" />
@@ -186,6 +188,8 @@
     <ClInclude Include="PlayerStateAttack.h" />
     <ClInclude Include="PlayerStateJump.h" />
     <ClInclude Include="PlayerStateRoot.h" />
+    <ClInclude Include="SceneStateClear.h" />
+    <ClInclude Include="SceneStateGameOver.h" />
     <ClInclude Include="SceneStatePlay.h" />
     <ClInclude Include="SceneStateTitle.h" />
     <ClInclude Include="scene\GameScene.h" />

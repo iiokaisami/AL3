@@ -1,6 +1,5 @@
 #include "FollowCamera.h"
 #include "Input.h"
-#include "ImGuiManager.h"
 
 
 FollowCamera::~FollowCamera() {

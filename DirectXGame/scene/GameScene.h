@@ -199,4 +199,12 @@ private: // メンバ変数
 	Audio* audioPlayBGM_ = nullptr;
 	uint32_t soundPlayBGM_ = 0;
 	uint32_t playPlayBGM_ = 0;
+
+	Audio* audioClearSE_ = nullptr;
+	uint32_t soundClearSE_ = 0;
+	uint32_t playClearSE_ = 0;
+
+	Audio* audioGameOverSE_ = nullptr;
+	uint32_t soundGameOverSE_ = 0;
+	uint32_t playGameOverSE_ = 0;
 };

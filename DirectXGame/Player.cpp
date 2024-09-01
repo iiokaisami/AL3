@@ -25,7 +25,7 @@ Player::~Player() {
 	}
 }
 
-void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm,Model* modelBullet) {
+void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet, Model* model, uint32_t font) {
 
 	// NULLポインタチェック
 	assert(modelBody);
@@ -33,9 +33,9 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	assert(modelL_arm);
 	assert(modelR_arm);
 
-	//assert(model);
-	//model_ = model;
-	//font_ = font;
+	assert(model);
+	model_ = model;
+	font_ = font;
 
 	modelBody_ = modelBody;
 	modelHead_ = modelHead;
@@ -103,6 +103,13 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, M
 	 isHit = false;
 
 	 isDeath_ = false;
+
+	 audioAttackSE_ = Audio::GetInstance();
+	 soundAttackSE_ = audioAttackSE_->LoadWave("attackSE.wav");
+
+	  audioDamageSE_ = Audio::GetInstance();
+	 soundDamageSE_ = audioDamageSE_->LoadWave("playerDamageSE.wav");
+
 };
 
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
@@ -197,6 +204,7 @@ void Player::Attack() {
 
 		isAttack_ = true;
 
+		 playAttackSE_ = audioAttackSE_->PlayWave(soundAttackSE_, false, 0.2f);
 	}
 }
 
@@ -242,7 +250,7 @@ void Player::Draw() {
 	}
 
 	//3Dレティクルを描画
-	modelBullet_->Draw(worldTransform3DReticle_, *viewProjection_);
+	model_->Draw(worldTransform3DReticle_, *viewProjection_, font_);
 }
 
 void Player::Move() {
@@ -377,6 +385,7 @@ Vector3 Player::GetWorld3DReticlePosition() {
 
 void Player::OnCollision() {
 	
+	 playDamageSE_ = audioDamageSE_->PlayWave(soundDamageSE_, false, 0.2f);
 	isHit = true;
 	hitPoint -= kDamage;
 }

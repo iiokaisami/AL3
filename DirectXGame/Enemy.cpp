@@ -9,8 +9,6 @@
 #include "WinApp.h"
 
 
-#include "ImGuiManager.h"
-
 Enemy::~Enemy() { 
 	delete calculationMath_;
 
@@ -76,6 +74,12 @@ void Enemy::Initialize(Model* model, Vector3 position, Model* modelBody, Model* 
 	SetCollisionMask(0b1);
 
 	InitializeFloatingGimick();
+
+	audioAttackSE_ = Audio::GetInstance();
+	soundAttackSE_ = audioAttackSE_->LoadWave("attackSE.wav");
+
+	audioDamageSE_ = Audio::GetInstance();
+	soundDamageSE_ = audioDamageSE_->LoadWave("enemyDamageSE.wav");
 }
 
 void Enemy::Update() {
@@ -119,18 +123,6 @@ void Enemy::Update() {
 	Move();
 
 	worldTransform_.UpdateMatrix();
-
-	ImGui::Begin("enemy Model");
-
-	ImGui::SliderFloat3("Head Translation", &worldTransform_.translation_.x, -20.0f, 20.0f);
-	ImGui::SliderFloat3("Head ratate", &worldTransform_.rotation_.x, -20.0f, 20.0f);
-
-	ImGui::SliderFloat3("ToPlayer", &toPlayer.x, -20.0f, 20.0f);
-	ImGui::DragInt("HP", &hitPoint_, 1);
-
-	
-
-	ImGui::End();
 }
 
 void Enemy::Fire() {
@@ -148,6 +140,8 @@ void Enemy::Fire() {
 	Vector3 normalVec = calculationMath_->Normalize(differenceVector);
 	// ベクトルの長さを、速さに合わせる
 	velocity_ = calculationMath_->Multiply(kBulletSpeed, normalVec);
+
+	playAttackSE_ = audioAttackSE_->PlayWave(soundAttackSE_, false, 0.2f);
 }
 
 void Enemy::Draw(ViewProjection& viewProjection_) {
@@ -191,6 +185,7 @@ Vector3 Enemy::GetWorldPosition() {
 }
 
 void Enemy::OnCollision(){ 
+	 playDamageSE_ = audioDamageSE_->PlayWave(soundDamageSE_, false, 0.2f);
 	hitPoint_ -= damage_;
 }
 

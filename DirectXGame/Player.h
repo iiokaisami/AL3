@@ -9,6 +9,7 @@
 #include "Sprite.h"
 #include "Collider.h"
 #include "BasePlayerState.h"
+#include "Audio.h"
 
 class Enemy;
 
@@ -17,7 +18,7 @@ class Player :public Collider
 public:
 	~Player();
 
-	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet);
+	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelBullet, Model* model, uint32_t font);
 
 	void Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys);
 
@@ -105,8 +106,9 @@ private:
 	// 弾
 	Model* modelBullet_ = nullptr;
 	
+	Model* model_ = nullptr;
 	// テクスチャハンドル
-	//uint32_t font_ = 0u;
+	uint32_t font_ = 0u;
 
 	// キーボード入力
 	Input* input_ = nullptr;
@@ -197,4 +199,13 @@ private:
 	float damageCount = 60.0f;
 	bool isHit = false;
 	bool isDeath_ = false;
+
+	// SE
+	Audio* audioDamageSE_ = nullptr;
+	uint32_t soundDamageSE_ = 0;
+	uint32_t playDamageSE_ = 0;
+
+	Audio* audioAttackSE_ = nullptr;
+	uint32_t soundAttackSE_ = 0;
+	uint32_t playAttackSE_ = 0;
 };

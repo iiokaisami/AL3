@@ -51,6 +51,8 @@ public:
 
 	bool isDeath() { return isDeath_; }
 
+	void DeathON() { isDeath_ = true; }
+
 	Vector3 GetVelocity() { return velocity_; }
 
 	bool GetIsFire() { return isFire; }
@@ -143,4 +145,13 @@ private:
 
 	Vector3 toPlayer = {};
 	Vector3 velocity = {0, 0, 0};
+
+	// SE
+	Audio* audioDamageSE_ = nullptr;
+	uint32_t soundDamageSE_ = 0;
+	uint32_t playDamageSE_ = 0;
+
+	Audio* audioAttackSE_ = nullptr;
+	uint32_t soundAttackSE_ = 0;
+	uint32_t playAttackSE_ = 0;
 };

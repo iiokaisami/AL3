@@ -65,11 +65,15 @@ void GameScene::Initialize() {
 
 	modelEnemyBullet_.reset(Model::CreateFromOBJ("enemyBullet", true));
 
+
+	texture_ = TextureManager::Load("reticle.png");
+	model_ = Model::Create();
+
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
 	Vector3 playerPosition(0, 0, 20.0f);
-	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(),modelBullet_.get());
+	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(),modelBullet_.get(),model_,texture_);
 	 
 	LoadEnemyPopData();
 	 
@@ -133,7 +137,7 @@ void GameScene::InitializePlay() {
 
 	followCamera_->Initialize();
 	AddEnemy({6.0f, 2.0f, 100.0f});
-	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(), modelBullet_.get());
+	player_->Initialize(modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(), modelFighterR_arm_.get(), modelBullet_.get(), model_, texture_);
 
 	audioPlayBGM_ = Audio::GetInstance();
 	soundPlayBGM_ = audioPlayBGM_->LoadWave("bgm_play.wav");
@@ -149,6 +153,10 @@ void GameScene::InitializeClear() {
 	spriteClearUI_ = Sprite::Create(textureClearUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 	spriteClearBG_ = Sprite::Create(textureClearBG_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 	
+	audioClearSE_ = Audio::GetInstance();
+	soundClearSE_ = audioClearSE_->LoadWave("clear.wav");
+
+	playClearSE_ = audioClearSE_->PlayWave(soundClearSE_, false, 0.2f);
 }
 
 void GameScene::InitializeGameOver() {
@@ -158,6 +166,15 @@ void GameScene::InitializeGameOver() {
 	// スプライト生成
 	spriteGameOverUI_ = Sprite::Create(textureGameOverUI_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 	spriteGameOverBG_ = Sprite::Create(textureGameOverBG_, {640, 360}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
+	for (Enemy* enemy : enemys_) {
+		enemy->DeathON();
+	}
+
+	audioGameOverSE_ = Audio::GetInstance();
+	soundGameOverSE_ = audioGameOverSE_->LoadWave("gameOver.wav");
+
+	playGameOverSE_ = audioGameOverSE_->PlayWave(soundGameOverSE_, false, 0.2f);
 }
 
 void GameScene::Update() { 
@@ -212,28 +229,6 @@ void GameScene::Update() {
 		return false;
 	});
 
-	
-	//敵更新
-	for (Enemy* enemy : enemys_) {
-
-		if (enemy) {
-			enemy->Update();
-
-			if (enemy->GetIsFire()) {
-
-				// 弾を生成し、初期化
-				EnemyBullet* newBullet = new EnemyBullet();
-				newBullet->Initialize(modelEnemyBullet_.get(), enemy->GetWorldPosition(), enemy->GetVelocity());
-				newBullet->SetPlayer(player_);
-
-				// 弾を登録する
-				AddEnemyBullet(newBullet);
-
-				enemy->SetIsFire(false);
-			}
-		}
-	}
-
 
 	player_->SetEnemy(enemys_);
 
@@ -275,6 +270,26 @@ void GameScene::UpdatePlay() {
 	// 自キャラの更新
 	player_->Update(viewProjection_, enemys_);
 
+	// 敵更新
+	for (Enemy* enemy : enemys_) {
+
+		if (enemy) {
+			enemy->Update();
+
+			if (enemy->GetIsFire()) {
+
+				// 弾を生成し、初期化
+				EnemyBullet* newBullet = new EnemyBullet();
+				newBullet->Initialize(modelEnemyBullet_.get(), enemy->GetWorldPosition(), enemy->GetVelocity());
+				newBullet->SetPlayer(player_);
+
+				// 弾を登録する
+				AddEnemyBullet(newBullet);
+
+				enemy->SetIsFire(false);
+			}
+		}
+	}
 }
 
 void GameScene::UpdateClear() { 
@@ -355,7 +370,7 @@ void GameScene::DrawTitle2D() {
 }
 
 void GameScene::DrawPlay() {
-	player_->Draw();
+	
 
 	// 敵描画
 	for (Enemy* enemy : enemys_) {
@@ -368,6 +383,8 @@ void GameScene::DrawPlay() {
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Draw(viewProjection_);
 	}
+
+	player_->Draw();
 }
 
 void GameScene::DrawPlay2D() { 
@@ -385,12 +402,14 @@ void GameScene::DrawClear2D() {
 }
 
 void GameScene::DrawGameOver() {
-	player_->Draw();
+	
 	for (Enemy* enemy : enemys_) {
 		if (enemy) {
 			enemy->Draw(viewProjection_);
 		}
 	}
+
+	player_->Draw();
 }
 
 void GameScene::DrawGameOver2D() {

@@ -325,6 +325,9 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 		  worldTransform3DReticle_.UpdateMatrix();
 
+		  #ifdef DEBUG
+
+
 		 ImGui::Begin("Player");
 
 		 ImGui::Text("2DReticle:(%.2f,%.2f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);
@@ -335,7 +338,8 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 		 ImGui::Text("w:(%+.2f,%+.2f,%+.2f)", GetWorldPosition().x, GetWorldPosition().y, GetWorldPosition().z);
 
 		 ImGui::End();
-		 
+
+#endif // DEBUG		 
 		 return;
 	 }
 
@@ -369,6 +373,8 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, controlDirection), cPosNear);
 	 worldTransform3DReticle_.UpdateMatrix();
 
+	 #ifdef DEBUG
+
 
 	 ImGui::Begin("Player");
 
@@ -379,6 +385,7 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 
 	 ImGui::End();
 
+#endif // DEBUG
 }
 
 void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {

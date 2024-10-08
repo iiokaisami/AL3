@@ -280,34 +280,49 @@ void Player::OnCollision() {
 		Vector3 pos = enemy->GetWorldPosition();
 		Vector3 position = GetWorldPosition();
 
-		if (kSpeed.x >= 0) {
-			if (position.x <= pos.x) {
-				kSpeed.x = -0.05f;
+		if (kSpeed.x >= 0) 
+		{
+			if (position.x <= pos.x) 
+			{
+				kSpeed.x *= -0.8f;
 			}
-			else{
-				kSpeed.x = 0.05f;
+			else 
+			{
+				kSpeed.x *= 0.8f;
 			}
 		} 
-		else if (kSpeed.x < 0) {
-			if (position.x >= pos.x) {
-				kSpeed.x = 0.05f;
+		else
+		{
+			if (position.x <= pos.x) 
+			{
+				kSpeed.x *= 0.8f;
 			}
-			else{
-				kSpeed.x = -0.05f;
+			else
+			{
+				kSpeed.x *= -0.8f;
 			}
 		}
 
-		if (kSpeed.y >= 0) {
-			if (position.y <= pos.y) {
-				kSpeed.y = -0.05f;
-			} else {
-				kSpeed.y = 0.05f;
+		if (kSpeed.y >= 0) 
+		{
+			if (position.y <= pos.y) 
+			{
+				kSpeed.y *= -0.8f;
 			}
-		} else if (kSpeed.y < 0) {
-			if (position.y > pos.y) {
-				kSpeed.y = 0.05f;
-			} else {
-				kSpeed.y = -0.05f;
+			else
+			{
+				kSpeed.y *= 0.8f;
+			}
+		}
+		else
+		{
+			if (position.y <= pos.y) 
+			{
+				kSpeed.y *= 0.8f;
+			}
+			else
+			{
+				kSpeed.y *= -0.8f;
 			}
 		}
 	}

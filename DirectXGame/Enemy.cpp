@@ -29,7 +29,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 	calculationMath_ = new CalculationMath;
 
-	radius_ = 2.0f;
+	radius_ = 1.0f;
 
 	isDeath_ = false;
 
@@ -124,7 +124,7 @@ void Enemy::TimeReset() {
 	isFire = true;
 
 	// 弾を発射
-	Fire();
+	//Fire();
 
 	//timeCalls_.push_back(new TimeCall(std::bind(&Enemy::TimeReset, this, kFireInterval)));
 

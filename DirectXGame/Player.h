@@ -109,4 +109,8 @@ private:
 
 	float length = 100.0f;
 	float reticleRadius_ = 35.0f;
+
+
+
+	Vector2 kSpeed = {0.0f, 0.0f};
 };

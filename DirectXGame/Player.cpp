@@ -37,7 +37,7 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 	calculationMath_ = new CalculationMath;
 
-	radius_ = 2.0f;
+	radius_ = 1.0f;
 
 	// 3Dレティクル用のワールドトランスフォーム初期化
 	worldTransform3DReticle_.Initialize();
@@ -66,6 +66,7 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 
 	// キャラクターの移動速さ
 	const float kCharacterSpeed = 0.2f;
+	
 
 	//デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
@@ -77,17 +78,34 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	});
 
 	// 回転速さ[ラジアン/frame]
-	const float kRotSpeed = 0.02f;
+	//const float kRotSpeed = 0.02f;
 
 	// 押した方向で移動ベクトルを変更
 	if (input_->PushKey(DIK_A)) {
 
-		worldTransformBlock.rotation_.y += kRotSpeed;
+		kSpeed.x = -0.1f;
+		// worldTransformBlock.rotation_.y += kRotSpeed;
 
 	} else if (input_->PushKey(DIK_D)) {
 
-		worldTransformBlock.rotation_.y -= kRotSpeed;
+		kSpeed.x = 0.1f;
+		// worldTransformBlock.rotation_.y -= kRotSpeed;
 	}
+	if (input_->PushKey(DIK_W)) {
+
+		kSpeed.y = 0.1f;
+		// worldTransformBlock.rotation_.y += kRotSpeed;
+
+	} else if (input_->PushKey(DIK_S)) {
+
+			kSpeed.y = -0.1f;
+		// worldTransformBlock.rotation_.y -= kRotSpeed;
+	}
+
+
+	move.x += kSpeed.x;
+	move.y += kSpeed.y;
+
 
 	// 押した方向で移動ベクトルを変更（左右）
 	if (input_->PushKey(DIK_LEFT)) {
@@ -120,15 +138,15 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	}
 
 
-	// 移動限界座標
-	const float kMoveLimitX = 10;
-	const float kMoveLimitY = 6;
+	//// 移動限界座標
+	//const float kMoveLimitX = 10;
+	//const float kMoveLimitY = 6;
 
-	// 範囲を超えない処理
-	worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
-	worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
-	worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
-	worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
+	//// 範囲を超えない処理
+	//worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
+	//worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
+	//worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
+	//worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
 
 	// 座標移動（ベクトルの加算）
 	worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
@@ -257,6 +275,42 @@ Vector3 Player::GetWorld3DReticlePosition() {
 
 void Player::OnCollision() {
 	// 何もしない
+	for (Enemy* enemy : enemys_) {
+
+		Vector3 pos = enemy->GetWorldPosition();
+		Vector3 position = GetWorldPosition();
+
+		if (kSpeed.x >= 0) {
+			if (position.x <= pos.x) {
+				kSpeed.x = -0.05f;
+			}
+			else{
+				kSpeed.x = 0.05f;
+			}
+		} 
+		else if (kSpeed.x < 0) {
+			if (position.x >= pos.x) {
+				kSpeed.x = 0.05f;
+			}
+			else{
+				kSpeed.x = -0.05f;
+			}
+		}
+
+		if (kSpeed.y >= 0) {
+			if (position.y <= pos.y) {
+				kSpeed.y = -0.05f;
+			} else {
+				kSpeed.y = 0.05f;
+			}
+		} else if (kSpeed.y < 0) {
+			if (position.y > pos.y) {
+				kSpeed.y = 0.05f;
+			} else {
+				kSpeed.y = -0.05f;
+			}
+		}
+	}
 }
 
 void Player::SetParent(const WorldTransform* parent) {

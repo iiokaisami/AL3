@@ -117,4 +117,5 @@ private:
 	Vector3 preprepos{};
 	Vector3 eneVel{};
 	bool isHit = false;
+	int hitTimer = 0;
 };

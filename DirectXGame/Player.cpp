@@ -62,6 +62,24 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	preprepos = prePos;
 	prePos = GetWorldPosition();
 
+	ImGui::Begin("Player");
+
+	ImGui::Text("w:(%+.2f,%+.2f,%+.2f)", GetWorldPosition().x, GetWorldPosition().y, GetWorldPosition().z);
+	ImGui::Text("cSpeed:(%+.2f,%+.2f,%+.2f)", kSpeed.x, kSpeed.y, kSpeed.z);
+	ImGui::Text("EnemyVel:(%+.2f,%+.2f,%+.2f)", eneVel.x, eneVel.y, eneVel.z);
+
+		if (isHit == true) {
+			ImGui::Text("true");
+	    } else if (isHit == false) {
+		    ImGui::Text("false");
+	    }
+
+	ImGui::Text("timer:(%d)",hitTimer);
+
+		
+	ImGui::End();
+
+
 	worldTransformBlock.UpdateMatrix();
 
 	// キャラクターの移動ベクトル
@@ -108,9 +126,15 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 		kSpeed = {0, 0, 0};
 	}
 
-	if (isHit) {
-		kSpeed = calculationMath_->Add(kSpeed, eneVel * 1.0f);
+	if (isHit /*&& (eneVel.x != 0.0f || eneVel.y != 0.0f)*/) {
+		kSpeed = calculationMath_->Add(kSpeed, eneVel * 0.4f);
+		eneVel = {0.0f, 0.0f, 0.0f};
 		isHit = false;
+	}
+
+	if (hitTimer >= 0)
+	{
+		hitTimer--;
 	}
 
 	if (kSpeed.x < -0.15f or kSpeed.x > 0.15f or kSpeed.y < -0.15f or kSpeed.y > 0.15f) {
@@ -161,10 +185,10 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	const float kMoveLimitY = 10;
 
 	// 範囲を超えない処理
-	worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
+	/*worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
 	worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
 	worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
-	worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
+	worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);*/
 
 	if (worldTransformBlock.translation_.x <= -kMoveLimitX or worldTransformBlock.translation_.x >= kMoveLimitX)
 	{
@@ -305,16 +329,21 @@ Vector3 Player::GetWorld3DReticlePosition() {
 void Player::OnCollision() {
 	// 何もしない
 
-	worldTransformBlock.translation_ = preprepos;
+	//worldTransformBlock.translation_ = preprepos;
 
 	//kSpeed.x *= -1.0f;
 	//kSpeed.y *= -1.0f;
 
-	for (Enemy* enemy : enemys_) {
+	if (!isHit && hitTimer <= 0) {
+		for (Enemy* enemy : enemys_) {
 
-		eneVel = enemy->GetVel();
+			eneVel = enemy->GetVel();
+		}
+		hitTimer = 40;
+	
+		isHit = true;
 	}
-	isHit = true;
+	
 }
 
 void Player::SetParent(const WorldTransform* parent) {

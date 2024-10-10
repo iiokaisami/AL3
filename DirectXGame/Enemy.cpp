@@ -110,7 +110,7 @@ Vector3 Enemy::GetWorldPosition() {
 }
 
 void Enemy::OnCollision(){ 
-	isDeath_ = true;
+	//isDeath_ = true;
 }
 
 

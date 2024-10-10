@@ -105,6 +105,9 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 		// worldTransformBlock.rotation_.y -= kRotSpeed;
 	}
 
+	if (input_->PushKey(DIK_RETURN)) {
+		kSpeed = {0, 0, 0};
+	}
 
 	move.x += kSpeed.x;
 	move.y += kSpeed.y;

@@ -113,4 +113,6 @@ private:
 
 
 	Vector2 kSpeed = {0.0f, 0.0f};
+	Vector3 prePos = {0.0f,0.0f,0.0f};
+	Vector3 preprepos{};
 };

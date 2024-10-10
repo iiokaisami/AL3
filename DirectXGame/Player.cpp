@@ -59,6 +59,9 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
 
+	preprepos = prePos;
+	prePos = GetWorldPosition();
+
 	worldTransformBlock.UpdateMatrix();
 
 	// キャラクターの移動ベクトル
@@ -137,16 +140,28 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;
 	}
 
+	
 
-	//// 移動限界座標
-	//const float kMoveLimitX = 10;
-	//const float kMoveLimitY = 6;
+	// 移動限界座標
+	const float kMoveLimitX = 17;
+	const float kMoveLimitY = 10;
 
-	//// 範囲を超えない処理
-	//worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
-	//worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
-	//worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
-	//worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
+	// 範囲を超えない処理
+	worldTransformBlock.translation_.x = max(worldTransformBlock.translation_.x, -kMoveLimitX);
+	worldTransformBlock.translation_.x = min(worldTransformBlock.translation_.x, kMoveLimitX);
+	worldTransformBlock.translation_.y = max(worldTransformBlock.translation_.y, -kMoveLimitY);
+	worldTransformBlock.translation_.y = min(worldTransformBlock.translation_.y, kMoveLimitY);
+
+	if (worldTransformBlock.translation_.x <= -kMoveLimitX or worldTransformBlock.translation_.x >= kMoveLimitX)
+	{
+		worldTransformBlock.translation_ = preprepos;
+		kSpeed.x *= -1.0f;
+	}
+	if (worldTransformBlock.translation_.y <= -kMoveLimitY or worldTransformBlock.translation_.y >= kMoveLimitY) {
+		worldTransformBlock.translation_ = preprepos;
+		kSpeed.y *= -1.0f;
+	}
+
 
 	// 座標移動（ベクトルの加算）
 	worldTransformBlock.translation_ = calculationMath_->Add(worldTransformBlock.translation_, move);
@@ -275,54 +290,42 @@ Vector3 Player::GetWorld3DReticlePosition() {
 
 void Player::OnCollision() {
 	// 何もしない
+
+	worldTransformBlock.translation_ = preprepos;
+
+	//kSpeed.x *= -1.0f;
+	//kSpeed.y *= -1.0f;
+
 	for (Enemy* enemy : enemys_) {
 
 		Vector3 pos = enemy->GetWorldPosition();
 		Vector3 position = GetWorldPosition();
 
-		if (kSpeed.x >= 0) 
-		{
-			if (position.x <= pos.x) 
-			{
-				kSpeed.x *= -0.8f;
+		if (kSpeed.x >= 0) {
+			if (position.x <= pos.x) {
+				kSpeed.x *= -1.0f;
+			} else {
+				kSpeed.x *= 1.0f;
 			}
-			else 
-			{
-				kSpeed.x *= 0.8f;
-			}
-		} 
-		else
-		{
-			if (position.x <= pos.x) 
-			{
-				kSpeed.x *= 0.8f;
-			}
-			else
-			{
-				kSpeed.x *= -0.8f;
+		} else {
+			if (position.x <= pos.x) {
+				kSpeed.x *= 1.0f;
+			} else {
+				kSpeed.x *= -1.0f;
 			}
 		}
 
-		if (kSpeed.y >= 0) 
-		{
-			if (position.y <= pos.y) 
-			{
-				kSpeed.y *= -0.8f;
+		if (kSpeed.y >= 0) {
+			if (position.y <= pos.y) {
+				kSpeed.y *= -1.0f;
+			} else {
+				kSpeed.y *= 1.0f;
 			}
-			else
-			{
-				kSpeed.y *= 0.8f;
-			}
-		}
-		else
-		{
-			if (position.y <= pos.y) 
-			{
-				kSpeed.y *= 0.8f;
-			}
-			else
-			{
-				kSpeed.y *= -0.8f;
+		} else {
+			if (position.y <= pos.y) {
+				kSpeed.y *= 1.0f;
+			} else {
+				kSpeed.y *= -1.0f;
 			}
 		}
 	}

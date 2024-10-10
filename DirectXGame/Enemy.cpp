@@ -25,7 +25,7 @@ void Enemy::Initialize(Model* model, Vector3 position) {
 
 	worldTransform_.translation_ = position;
 
-	vel_ = {0, 0, 0};
+	vel_ = {-0.2f, -0.2f, 0.0f};
 
 	calculationMath_ = new CalculationMath;
 
@@ -110,7 +110,7 @@ Vector3 Enemy::GetWorldPosition() {
 }
 
 void Enemy::OnCollision(){ 
-	//isDeath_ = true;
+	isDeath_ = true;
 }
 
 

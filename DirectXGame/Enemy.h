@@ -71,6 +71,10 @@ public:
 
 	Vector3 ChangeScreenPos(ViewProjection& viewProjection_);
 
+
+
+	Vector3 GetVel() { return vel_; }
+
 private:
 
 	// ワールド変換データ

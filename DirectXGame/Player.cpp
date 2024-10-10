@@ -69,9 +69,8 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 
 	// キャラクターの移動速さ
 	const float kCharacterSpeed = 0.2f;
-	
 
-	//デスフラグの立った弾を削除
+	// デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
 			delete bullet;
@@ -81,7 +80,7 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	});
 
 	// 回転速さ[ラジアン/frame]
-	//const float kRotSpeed = 0.02f;
+	// const float kRotSpeed = 0.02f;
 
 	// 押した方向で移動ベクトルを変更
 	if (input_->PushKey(DIK_A)) {
@@ -101,10 +100,25 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 
 	} else if (input_->PushKey(DIK_S)) {
 
-			kSpeed.y = -0.1f;
+		kSpeed.y = -0.1f;
 		// worldTransformBlock.rotation_.y -= kRotSpeed;
 	}
 
+	if (input_->PushKey(DIK_RETURN)) {
+		kSpeed = {0, 0, 0};
+	}
+
+	if (isHit) {
+		kSpeed = calculationMath_->Add(kSpeed, eneVel * 1.0f);
+		isHit = false;
+	}
+
+	if (kSpeed.x < -0.15f or kSpeed.x > 0.15f or kSpeed.y < -0.15f or kSpeed.y > 0.15f) {
+		kSpeed.x = max(kSpeed.x, 0.15f);
+		kSpeed.x = min(kSpeed.x, -0.15f);
+		kSpeed.y = max(kSpeed.y, 0.15f);
+		kSpeed.y = min(kSpeed.y, -0.15f);
+	}
 
 	move.x += kSpeed.x;
 	move.y += kSpeed.y;
@@ -298,37 +312,9 @@ void Player::OnCollision() {
 
 	for (Enemy* enemy : enemys_) {
 
-		Vector3 pos = enemy->GetWorldPosition();
-		Vector3 position = GetWorldPosition();
-
-		if (kSpeed.x >= 0) {
-			if (position.x <= pos.x) {
-				kSpeed.x *= -1.0f;
-			} else {
-				kSpeed.x *= 1.0f;
-			}
-		} else {
-			if (position.x <= pos.x) {
-				kSpeed.x *= 1.0f;
-			} else {
-				kSpeed.x *= -1.0f;
-			}
-		}
-
-		if (kSpeed.y >= 0) {
-			if (position.y <= pos.y) {
-				kSpeed.y *= -1.0f;
-			} else {
-				kSpeed.y *= 1.0f;
-			}
-		} else {
-			if (position.y <= pos.y) {
-				kSpeed.y *= 1.0f;
-			} else {
-				kSpeed.y *= -1.0f;
-			}
-		}
+		eneVel = enemy->GetVel();
 	}
+	isHit = true;
 }
 
 void Player::SetParent(const WorldTransform* parent) {

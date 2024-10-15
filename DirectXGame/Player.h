@@ -83,7 +83,7 @@ private:
 	std::list<PlayerBullet*> bullets_;
 
 	//半径
-	float radius_ = 0;
+	float radius_ = 1.0f;
 
 	// 3Dレティクル用ワールドトランスフォーム
 	WorldTransform worldTransform3DReticle_;
@@ -115,4 +115,5 @@ private:
 	Vector3 kSpeed{};
 	Vector3 prePos = {0.0f,0.0f,0.0f};
 	Vector3 preprepos{};
+	int hitTimer = 0;
 };

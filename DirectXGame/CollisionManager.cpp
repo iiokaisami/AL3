@@ -50,7 +50,6 @@ void CollisionManager::ClearList() {
 
 void CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 	Vector3 posA, posB;
-
 	posA = colliderA->GetWorldPosition();
 	posB = colliderB->GetWorldPosition();
 

@@ -98,7 +98,7 @@ private:
 	Player* player_ = nullptr;
 
 	// 半径
-	float radius_ = 0.0f;
+	float radius_ = 0.5f;
 
 	//ゲームシーン
 	GameScene* gameScene_ = nullptr;

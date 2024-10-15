@@ -62,6 +62,16 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	preprepos = prePos;
 	prePos = GetWorldPosition();
 
+	ImGui::Begin("Player");
+
+	ImGui::Text("w:(%+.2f,%+.2f,%+.2f)", GetWorldPosition().x, GetWorldPosition().y, GetWorldPosition().z);
+	ImGui::Text("cSpeed:(%+.2f,%+.2f,%+.2f)", kSpeed.x, kSpeed.y, kSpeed.z);
+	
+
+	ImGui::Text("timer:(%d)", hitTimer);
+
+	ImGui::End();
+
 	worldTransformBlock.UpdateMatrix();
 
 	// キャラクターの移動ベクトル
@@ -108,6 +118,12 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	if (input_->PushKey(DIK_RETURN)) {
 		kSpeed = {0, 0, 0};
 	}
+
+
+	if (hitTimer >= 0) {
+		hitTimer--;
+	}
+
 
 	move.x += kSpeed.x;
 	move.y += kSpeed.y;
@@ -294,8 +310,6 @@ Vector3 Player::GetWorld3DReticlePosition() {
 void Player::OnCollision() {
 	// 何もしない
 
-	worldTransformBlock.translation_ = preprepos;
-
 	//kSpeed.x *= -1.0f;
 	//kSpeed.y *= -1.0f;
 
@@ -304,32 +318,39 @@ void Player::OnCollision() {
 		Vector3 pos = enemy->GetWorldPosition();
 		Vector3 position = GetWorldPosition();
 
-		if (kSpeed.x >= 0) {
-			if (position.x <= pos.x) {
-				kSpeed.x *= -1.0f;
-			} else {
-				kSpeed.x *= 1.0f;
-			}
-		} else {
-			if (position.x <= pos.x) {
-				kSpeed.x *= 1.0f;
-			} else {
-				kSpeed.x *= -1.0f;
-			}
-		}
+		if (hitTimer <= 0) {
 
-		if (kSpeed.y >= 0) {
-			if (position.y <= pos.y) {
-				kSpeed.y *= -1.0f;
+			//worldTransformBlock.translation_ = preprepos;
+
+			if (kSpeed.x >= 0) {
+				if (position.x <= pos.x) {
+					kSpeed.x *= -1.0f;
+				} else {
+					kSpeed.x *= 1.0f;
+				}
 			} else {
-				kSpeed.y *= 1.0f;
+				if (position.x <= pos.x) {
+					kSpeed.x *= 1.0f;
+				} else {
+					kSpeed.x *= -1.0f;
+				}
 			}
-		} else {
-			if (position.y <= pos.y) {
-				kSpeed.y *= 1.0f;
+
+			if (kSpeed.y >= 0) {
+				if (position.y <= pos.y) {
+					kSpeed.y *= -1.0f;
+				} else {
+					kSpeed.y *= 1.0f;
+				}
 			} else {
-				kSpeed.y *= -1.0f;
+				if (position.y <= pos.y) {
+					kSpeed.y *= 1.0f;
+				} else {
+					kSpeed.y *= -1.0f;
+				}
 			}
+			hitTimer =20;
+
 		}
 	}
 }

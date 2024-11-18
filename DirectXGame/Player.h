@@ -58,6 +58,10 @@ public:
 
 	void LockOnRemove(); 
 
+	void CloseEye();
+	void Stun();
+	void Inertia();
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransformBlock;
@@ -109,4 +113,23 @@ private:
 
 	float length = 100.0f;
 	float reticleRadius_ = 35.0f;
+
+
+	bool isHitNormal_ = false;
+	bool isHitPillow_ = false;
+	bool isHitSong_ = false;
+
+	int closeEyeTimer_ = 360;
+	int stunTimer_ = 180;
+	int inertiaTimer_ = 300;
+
+	// 2Dレティクル用のスプライト
+	uint32_t textureClose_ = 0;
+	Sprite* closeEyeSprite1_;
+	Sprite* closeEyeSprite2_;
+
+	Vector3 spritePosition1_{};
+	Vector3 spritePosition2_{};
+	float t = 0.0f;
+	int winkNum = 0;
 };

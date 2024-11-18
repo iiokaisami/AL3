@@ -5,6 +5,8 @@
 #include "WinApp.h"
 #include "Enemy.h"
 
+#include "Easing.h"
+
 Player::~Player() {
 	delete calculationMath_;
 
@@ -54,7 +56,13 @@ void Player::Initialize(Model* model, uint32_t font, Vector3 position) {
 
 	SetCollisionMask(0b1 << 1);
 
-	
+	// レティクル用テクスチャ取得
+	textureReticle = TextureManager::Load("reticle.png");
+
+	// スプライト生成
+	textureClose_ = TextureManager::Load("uvChecker.png");
+	closeEyeSprite1_ = Sprite::Create(textureClose_, {640, -256}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	closeEyeSprite2_ = Sprite::Create(textureClose_, {640, 976}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
 };
 
 void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& enemys) {
@@ -153,6 +161,26 @@ void Player::Update(ViewProjection& viewProjection, const std::list<Enemy*>& ene
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
 	}
+
+
+
+
+	#ifdef _DEBUG
+
+	ImGui::Begin("Splite");
+
+	ImGui::Checkbox("isHitNormal", &isHitNormal_);
+	ImGui::Text("splitePos:(%+.2f,%+.2f)", closeEyeSprite1_->GetPosition().x, closeEyeSprite1_->GetPosition().y);
+
+	ImGui::End();
+
+#endif // _DEBUG
+
+	if (isHitNormal_) 
+	{
+		CloseEye();
+	}
+
 };
 
 void Player::Attack() {
@@ -276,6 +304,12 @@ void Player::DrawUI(ViewProjection& viewProjection) {
 			reticle->Draw();
 		}
 	}
+
+	if (isHitNormal_)
+	{
+		closeEyeSprite1_->Draw();
+		closeEyeSprite2_->Draw();
+	}
 }
 
 // マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
@@ -373,19 +407,7 @@ void Player::MouseReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection)
 	 worldTransform3DReticle_.translation_ = calculationMath_->Add(calculationMath_->Multiply(kDistanceTestObject, controlDirection), cPosNear);
 	 worldTransform3DReticle_.UpdateMatrix();
 
-	 #ifdef DEBUG
-
-
-	 ImGui::Begin("Player");
-
-	 ImGui::Text("2DReticle:(%.2f,%.2f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);
-	 ImGui::Text("Near:(%+.2f,%+.2f,%+.2f)", cPosNear.x, cPosNear.y, cPosNear.z);
-	 ImGui::Text("Far:(%+.2f,%+.2f,%+.2f)", cPosFar.x, cPosFar.y, cPosFar.z);
-	 ImGui::Text("3DReticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x, worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
-
-	 ImGui::End();
-
-#endif // DEBUG
+	 
 }
 
 void Player::PlayerReticle(Matrix4x4 matViewPort, ViewProjection& viewProjection) {
@@ -491,4 +513,52 @@ void Player::LockOnRemove() {
 		}
 		return false;
 	});
+}
+
+void Player::CloseEye() {
+
+	closeEyeTimer_--;
+
+	if (--closeEyeTimer_ < 0)
+	{
+		isHitNormal_ = false;
+		t = 0.0f;
+		closeEyeTimer_ = 360;
+		closeEyeSprite1_->SetPosition({640, -256});
+		closeEyeSprite2_->SetPosition({640, 976});
+		winkNum = 0;
+	}
+
+	t += 1.0f / 60.0f;
+
+	if (t <= 1.0f) 
+	{
+		if (winkNum == 0) {
+			spritePosition1_ = calculationMath_->Lerp({640, -256, 0}, {640, 104, 0}, EaseInCubic(t));
+			spritePosition2_ = calculationMath_->Lerp({640, 976, 0}, {640, 616, 0}, EaseInCubic(t));
+		}
+		if (winkNum == 2)
+		{
+			spritePosition1_ = calculationMath_->Lerp({640, 104, 0}, {640, -256, 0}, EaseInCubic(t));
+			spritePosition2_ = calculationMath_->Lerp({640, 616, 0}, {640, 976, 0}, EaseInCubic(t));
+		}
+	} 
+	
+	if (t > 1.0f)
+	{
+		winkNum++;
+	}
+
+	closeEyeSprite1_->SetPosition({spritePosition1_.x, spritePosition1_.y});
+	closeEyeSprite2_->SetPosition({spritePosition2_.x, spritePosition2_.y});
+}
+
+void Player::Stun() {
+
+	--stunTimer_;
+}
+
+void Player::Inertia() {
+
+	--inertiaTimer_;
 }
